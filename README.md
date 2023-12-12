@@ -1,4 +1,4 @@
-﻿# CM20314 - ASP.NET Web API
+﻿# CM20314 - Android (Java)
 
 ## Get started
 1. [Download](https://developer.android.com/studio?gclid=CjwKCAiApuCrBhAuEiwA8VJ6JtYdGVqpRrWEiE5orle0YI5dG0VDqxCplSIUY8VUAHVrhPc6IP7KEBoCYbEQAvD_BwE&gclsrc=aw.ds) Android Studio. Ensure you also download the Virtual Android device(s) so you can test the code.
