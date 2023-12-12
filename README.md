@@ -7,7 +7,7 @@
 4. Run `git` to ensure git is installed correctly.
 5. Run `git clone https://github.com/CM20314/Android`.
 6. Run `cd Android`
-6. Run `git branch development`. **This is crucial.**
+6. Run `git checkout development`. **This is crucial.**
 
 ## Working on the project
 **Please follow these steps *very carefully* to avoid unnecessary headaches.**
