@@ -12,9 +12,9 @@
 ## Working on the project
 **Please follow these steps *very carefully* to avoid unnecessary headaches.**
 1. Before opening Visual Studio, go to the folder where your code is stored and open the command line.
-2. Run `git checkout -b feature-[feature_name]`, repacing `[feature_name]` with your feature, e.g. `feature-dijkstra`.
+2. Run `git checkout -b feature-[feature_name]`, replacing `[feature_name]` with your feature, e.g. `feature-dijkstra`.
 3. Write the code, test it etc.
-4. Run `git commit -a -m "[commit_name]"` replacing `[commit_name]` with your commit name, e.g. `fixed case for same start and destination`. If this tells you to add files, run `git add -A` and retry.
+4. Run `git commit -a -m "[commit_name]"` replacing `[commit_name]` with your commit name, e.g. `resolved #2`, to link it to your assigned issue. If this tells you to add files, run `git add -A` and retry. **Referencing `#n` will link your commit to your assigned issue `n`.**
 5. Run `git checkout development`. This moves your `HEAD` to the `development` branch.
 6. Run `git pull` (if this doesn't work, `git pull origin development`) to pull changes from the cloud to your local copy so as not to overwrite others' work.
 7. Run `git merge feature-[feature_name]`. This will merge your changes.
