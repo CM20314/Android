@@ -1,6 +1,7 @@
 package com.example.cm20314;
 
 import android.os.Bundle;
+import android.view.View;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -38,10 +39,19 @@ public class MainActivity extends AppCompatActivity {
                 .build();
 
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
-        if(navHostFragment != null){
+        if (navHostFragment != null) {
             NavController navController = navHostFragment.getNavController();
             NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-            NavigationUI.setupWithNavController(binding.navView, navController);
+
+            // Setup BottomNavigationView with NavController
+            BottomNavigationView bottomNavigationView = binding.navView;
+            NavigationUI.setupWithNavController(bottomNavigationView, navController);
+
+            // Add item selected listener to handle middle item click
+            bottomNavigationView.setOnItemSelectedListener(item -> {
+                return item.getItemId() == R.id.navigation_map || item.getItemId() == R.id.navigation_settings;
+            });
         }
+
     }
 }
