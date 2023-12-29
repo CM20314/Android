@@ -16,17 +16,18 @@
 1. Before opening Android Studio, go to `[your source directory]\Android` and open the command line.
 2. Run `git checkout -b feature-issue-[issue_number]`, replacing `[issue_number]` with your issue number, e.g. `feature-issue-1`.
 3. Write the code, test it etc. Remember to use unit tests. Every time you reach a key 'checkpoint' in your feature development, complete **step 4**. *A 'commit' is like a checkpoint.*
-4. Run `git commit -a -m "[commit_name]"` replacing `[commit_name]` with your commit name, e.g. `implemented Node class`, to link it to your assigned issue. If this tells you to add files, run `git add -A` and retry. 
-5. When you have reached a key milestone of developing your feature, which may occur just once, run `git push origin feature-issue-[issue-number]`. *(Once you've used this command once on this branch and it shows up on the website, you only need to use `git push`).*
-6. Go to the [repository pull requests on Github](https://github.com/CM20314/Android/pulls).
-7. Click **New pull request**.
-8. Set the `base` to `development`.
-9. Set the `compare` to `feature-issue-[issue-number]`. You will now see a list of your commits for your feature.
-10. Click **Create pull request**.
-11. Add a title, e.g. ```Implemented database model classes```.
-12. Add a description which mentions the issue number(s), e.g. ```Resolved #1``` or ```Resolved #1 and #2```.
-13. I will then review your pull request, resolve any merge conflicts and let you know if there are any changes that need to be made by adding a comment to the request. If there are, then make the changes in your same feature branch and follow **steps 3 to 5** - once you push, this will update the pull request automatically. 
-14. If you are sure you are done with the feature branch, run `git branch -D feature-issue-[issue-number]` to delete it. You won't need it any more. Otherwise, refer to step 3 of [Branch information](#branch-information).
+4. Run `git add -A`.
+5. Run `git commit -a -m "[commit_name]"` replacing `[commit_name]` with your commit name, e.g. `implemented Node class`, to link it to your assigned issue. If this tells you to add files, run `git add -A` and retry. 
+6. When you have reached a key milestone of developing your feature, which may occur just once, run `git push origin feature-issue-[issue-number]`. *(Once you've used this command once on this branch and it shows up on the website, you only need to use `git push`).*
+7. Go to the [repository pull requests on Github](https://github.com/CM20314/Android/pulls).
+8. Click **New pull request**.
+9. Set the `base` to `development`.
+10. Set the `compare` to `feature-issue-[issue-number]`. You will now see a list of your commits for your feature.
+11. Click **Create pull request**.
+12. Add a title, e.g. ```Implemented database model classes```.
+13. Add a description which mentions the issue number(s), e.g. ```Resolved #1``` or ```Resolved #1 and #2```.
+14. I will then review your pull request, resolve any merge conflicts and let you know if there are any changes that need to be made by adding a comment to the request. If there are, then make the changes in your same feature branch and follow **steps 3 to 5** - once you push, this will update the pull request automatically. 
+15. If you are sure you are done with the feature branch, run `git branch -D feature-issue-[issue-number]` to delete it. You won't need it any more. Otherwise, refer to step 3 of [Branch information](#branch-information).
 
 ~~5. Run `git checkout development`. This moves your `HEAD` to the `development` branch.~~
 ~~6. Run `git pull` (if this doesn't work, `git pull origin development`) to pull changes from the cloud to your local copy so as not to overwrite others' work.~~
