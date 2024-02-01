@@ -19,6 +19,9 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.cm20314.databinding.FragmentMapBinding;
+import com.example.cm20314.interfaces.IHttpRequestCallback;
+import com.example.cm20314.models.MapDataResponse;
+import com.example.cm20314.services.HttpRequestService;
 import com.example.cm20314.services.MapDataService;
 
 import java.util.ArrayList;
@@ -69,12 +72,30 @@ public class MapFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        mapDataService.getCampusMap();
-        System.out.println("COMPLETED");
+        mapDataService.getMap(0, 0, new IHttpRequestCallback<MapDataResponse>() {
+            @Override
+            public void onCompleted(HttpRequestService.HttpRequestResponse<MapDataResponse> response) {
+                if(response.ResponseStatusCode == 200){
+                    drawMapContent(response.Content);
+                }
+                else{
+                    // unsuccessful API call
+                }
+            }
+
+            @Override
+            public void onException() {
+                // erroneous API call
+            }
+        });
     }
 
     private void setAutoCompleteText(String text) {
         autoCompleteTextView.setText(text);
+    }
+
+    private void drawMapContent(MapDataResponse content){
+
     }
 
     // Replace this method with your actual data source
