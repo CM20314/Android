@@ -14,10 +14,12 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.cm20314.databinding.FragmentMapBinding;
+import com.example.cm20314.services.MapDataService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +28,7 @@ public class MapFragment extends Fragment {
 
     private FragmentMapBinding binding;
     private AutoCompleteTextView autoCompleteTextView;
+    private final MapDataService mapDataService = new MapDataService();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -60,6 +63,14 @@ public class MapFragment extends Fragment {
         recent_button3.setOnClickListener(v -> setAutoCompleteText(recent_button3.getText().toString()));
 
         return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        mapDataService.getCampusMap();
+        System.out.println("COMPLETED");
     }
 
     private void setAutoCompleteText(String text) {

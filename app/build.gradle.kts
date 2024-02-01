@@ -30,6 +30,13 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    sourceSets {
+        getByName("main") {
+            java {
+                srcDirs("src\\main\\java", "src\\main\\java\\com.example.cm20314\\services", "src\\main\\java", "src\\main\\java\\models", "src\\main\\java", "src\\main\\java\\interfaces")
+            }
+        }
+    }
 }
 
 dependencies {
@@ -41,6 +48,8 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
     implementation("androidx.navigation:navigation-fragment:2.7.5")
     implementation("androidx.navigation:navigation-ui:2.7.5")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-hibernate-parent:2.16.1")
+    implementation("com.google.code.gson:gson:2.10.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -51,4 +60,7 @@ dependencies {
 
 if (project.hasProperty("APPCENTER_KEY")) {
     android.defaultConfig.buildConfigField("String", "APPCENTER_KEY", "\"${project.findProperty("APPCENTER_KEY")}\"")
+}
+if (project.hasProperty("API_KEY")) {
+    android.defaultConfig.buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY")}\"")
 }
