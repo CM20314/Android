@@ -34,15 +34,17 @@ public class HttpRequestService<TIn, TOut> {
         private final boolean hasContent;
         private final Handler uiHandler;
         private final IHttpRequestCallback<TOut> callback;
+        private final Class<TOut> outClass;
 
         public SendRequestTask(HttpMethod method, String uri, TIn obj, boolean hasContent,
-                               Handler uiHandler, IHttpRequestCallback<TOut> callback) {
+                               Handler uiHandler, IHttpRequestCallback<TOut> callback, Class<TOut> outClass) {
             this.method = method;
             this.uri = uri;
             this.obj = obj;
             this.hasContent = hasContent;
             this.uiHandler = uiHandler;
             this.callback = callback;
+            this.outClass = outClass;
         }
 
         @Override
@@ -94,9 +96,7 @@ public class HttpRequestService<TIn, TOut> {
         }
 
         private TOut parseResponse(String responseBody) {
-            TypeToken<TOut> typeToken = new TypeToken<TOut>() {};
-
-            return new Gson().fromJson(responseBody, typeToken.getType());
+            return new Gson().fromJson(responseBody, outClass);
         }
 
         private void handleException() {
@@ -121,13 +121,13 @@ public class HttpRequestService<TIn, TOut> {
     }
 
     public void sendHttpRequest(HttpMethod method, String uri, TIn obj, boolean hasContent,
-                                IHttpRequestCallback<TOut> callback) {
+                                IHttpRequestCallback<TOut> callback, Class<TOut> outClass) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
         // Provide the exact types for TIn and TOut when creating SendRequestTask
         SendRequestTask<TIn, TOut> sendRequestTask = new SendRequestTask<TIn, TOut>(
-                method, uri, obj, hasContent, handler, callback
+                method, uri, obj, hasContent, handler, callback, outClass
         );
 
         executor.execute(sendRequestTask);

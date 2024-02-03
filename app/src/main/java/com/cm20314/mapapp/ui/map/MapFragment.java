@@ -66,17 +66,22 @@ public class MapFragment extends Fragment {
         return root;
     }
 
-    /*@Override
+    @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        loadMapData();
+    }
 
+    private void loadMapData(){
         mapDataService.getMap(0, 0, new IHttpRequestCallback<MapDataResponse>() {
             @Override
             public void onCompleted(HttpRequestService.HttpRequestResponse<MapDataResponse> response) {
                 if(response.ResponseStatusCode == 200){
+                    System.out.println("Successful call.");
                     drawMapContent(response.Content);
                 }
                 else{
+                    System.out.println("Unsuccessful call.");
                     // unsuccessful API call
                 }
             }
@@ -84,16 +89,17 @@ public class MapFragment extends Fragment {
             @Override
             public void onException() {
                 // erroneous API call
+                System.out.println("Failed call.");
             }
         });
-    }*/
+    }
 
     private void setAutoCompleteText(String text) {
         autoCompleteTextView.setText(text);
     }
 
     private void drawMapContent(MapDataResponse content){
-
+        System.out.println("Map downloaded.");
     }
 
     // Replace this method with your actual data source

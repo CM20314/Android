@@ -12,7 +12,8 @@ public class PathfindingService {
                 Constants.API_ROOT + "/directions",
                 requestData,
                 true,
-                callback
+                callback,
+                Object.class
                 /*new IHttpRequestCallback<MapDataResponse>() {
                     @Override
                     public void onCompleted(HttpRequestService.HttpRequestResponse<MapDataResponse> response) {
