@@ -1,6 +1,10 @@
 <resources>
-    <string name="app_name">CM20314</string>
+    <string name="app_name">MapApp</string>
     <string name="title_map">Map</string>
     <string name="title_settings">Settings</string>
-    <string name="empty" />
+    <string name="empty" > </string>
+
+    <string name="search_placeholder">Search&#8230;</string>
+    <string name="canvas_view_desc">Map</string>
+    <string name="search_icon_desc">Search icon</string>
 </resources>

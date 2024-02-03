@@ -13,5 +13,6 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "CM20314"
+rootProject.name = "MapApp"
 include(":app")
+ 

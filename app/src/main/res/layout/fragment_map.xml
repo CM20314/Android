@@ -6,16 +6,16 @@
     android:layout_height="match_parent"
     tools:context=".ui.map.MapFragment">
 
-    <ImageView
+    <com.cm20314.mapapp.ui.CanvasView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/map_background"
-        android:scaleType="centerCrop" />
-
-    <!-- Search Bar -->
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <RelativeLayout
-        android:id="@+id/relativeLayout"
+        android:id="@+id/search_relative_layout"
         android:layout_width="0dp"
         android:layout_height="50dp"
         android:layout_marginStart="8dp"
@@ -29,15 +29,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-
-
         <ImageView
-            android:id="@+id/searchIcon"
+            android:id="@+id/search_icon"
             android:layout_width="32dp"
             android:layout_height="25dp"
             android:layout_centerVertical="true"
             android:layout_marginStart="0dp"
-            android:src="@drawable/ic_search_icon" />
+            android:src="@drawable/ic_search_black_24dp"
+            android:contentDescription="@string/search_icon_desc"/>
 
         <AutoCompleteTextView
             android:id="@+id/autoCompleteTextView"
@@ -45,11 +44,11 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_marginTop="0dp"
-            android:layout_toEndOf="@id/searchIcon"
+            android:layout_toEndOf="@id/search_icon"
             android:background="@android:color/transparent"
             android:completionThreshold="1"
             android:dropDownWidth="300dp"
-            android:hint="Search..."
+            android:hint="@string/search_placeholder"
             android:popupBackground="#eff6ff" />
 
     </RelativeLayout>
@@ -70,7 +69,7 @@
         android:paddingEnd="10dp"
         android:text="Home"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/search_relative_layout" />
 
     <Button
         android:id="@+id/fav_button2"
@@ -86,7 +85,7 @@
         android:paddingEnd="10dp"
         android:text="Work"
         app:layout_constraintStart_toEndOf="@+id/fav_button"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/search_relative_layout" />
 
     <Button
         android:id="@+id/fav_button3"
@@ -104,7 +103,7 @@
         android:text="Gym"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/fav_button2"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@id/search_relative_layout" />
 
     <ImageView
         android:id="@+id/favIcon"
@@ -112,9 +111,9 @@
         android:layout_height="44dp"
         android:layout_marginStart="9dp"
         android:layout_marginTop="8dp"
-        android:src="@drawable/ic_star"
+        android:src="@drawable/ic_star_black_24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
+        app:layout_constraintTop_toBottomOf="@id/search_relative_layout" />
 
 
     <!-- Recents Section -->
@@ -133,7 +132,7 @@
         android:paddingEnd="10dp"
         android:text="10W 2.47"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fav_button" />
+        app:layout_constraintTop_toBottomOf="@id/fav_button" />
 
     <Button
         android:id="@+id/recent_button2"
@@ -148,8 +147,8 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp"
         android:text="CB 2.14"
-        app:layout_constraintStart_toEndOf="@+id/recent_button"
-        app:layout_constraintTop_toBottomOf="@+id/fav_button2" />
+        app:layout_constraintStart_toEndOf="@id/recent_button"
+        app:layout_constraintTop_toBottomOf="@id/fav_button2" />
 
     <Button
         android:id="@+id/recent_button3"
@@ -166,8 +165,8 @@
         android:paddingEnd="10dp"
         android:text="8W 1.1"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/recent_button2"
-        app:layout_constraintTop_toBottomOf="@+id/fav_button3" />
+        app:layout_constraintStart_toEndOf="@id/recent_button2"
+        app:layout_constraintTop_toBottomOf="@id/fav_button3" />
 
     <ImageView
         android:id="@+id/recentIcon"
@@ -175,8 +174,8 @@
         android:layout_height="39dp"
         android:layout_marginStart="12dp"
         android:layout_marginTop="9dp"
-        android:src="@drawable/ic_recent"
+        android:src="@drawable/ic_schedule_black_24dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/favIcon" />
+        app:layout_constraintTop_toBottomOf="@id/favIcon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
