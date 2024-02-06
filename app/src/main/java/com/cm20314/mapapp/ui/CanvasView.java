@@ -16,8 +16,12 @@ import android.view.WindowManager;
 import android.view.WindowMetrics;
 
 import com.cm20314.mapapp.R;
+import com.cm20314.mapapp.models.Building;
+import com.cm20314.mapapp.models.Coordinate;
+import com.cm20314.mapapp.models.MapDataResponse;
 
 public class CanvasView extends View {
+    private MapDataResponse mapData;
     private DisplayMetrics displayMetrics;
     //Fields
     private static float MIN_ZOOM = 1f;
@@ -129,6 +133,7 @@ public class CanvasView extends View {
         //   set to true (meaning the finger has actually moved)
         if ((mode == DRAG && scaleFactor != 1f && dragged) || mode == ZOOM) {
             invalidate();
+            dragged = false;
         }
 
         return true;
@@ -138,6 +143,8 @@ public class CanvasView extends View {
 
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        if(mapData == null) return;
 
         canvas.save();
 
@@ -172,9 +179,8 @@ public class CanvasView extends View {
         //because the translation amount also gets scaled according to how much we've zoomed into the canvas.
         canvas.translate(translateX / scaleFactor, translateY / scaleFactor);
         //Line
-        Paint paint = new Paint(); // Declare and initialize a Paint object
-        paint.setColor(Color.BLACK); // Set the line color to black
-        canvas.drawLine(0f, 0f, 500f, 500f, paint);
+        drawBuildings(canvas);
+
         canvas.restore();
     }
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
@@ -186,4 +192,31 @@ public class CanvasView extends View {
         }
     }
 
+    public void SetMapData(MapDataResponse data){
+        mapData = data;
+        invalidate();
+    }
+
+    private void drawBuildings(Canvas canvas){
+        Paint paint = new Paint(); // Declare and initialize a Paint object
+        paint.setColor(Color.BLACK); // Set the line color to black
+
+        try{
+            for(Building building : mapData.buildings){
+                for(int i = 0; i < building.polyline.coordinates.size()-1; i++){
+                    Coordinate startCoordinate = building.polyline.coordinates.get(i);
+                    Coordinate endCoordinate = building.polyline.coordinates.get(i+1);
+                    canvas.drawLine((float) startCoordinate.x, (float) -startCoordinate.y, (float) endCoordinate.x, (float) -endCoordinate.y, paint);
+                }
+            }
+
+        }
+        catch(Exception ex){
+            System.out.println("break");
+
+
+        }
+
+
+    }
 }

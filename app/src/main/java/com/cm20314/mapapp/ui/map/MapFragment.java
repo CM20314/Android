@@ -19,6 +19,7 @@ import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.MapDataResponse;
 import com.cm20314.mapapp.services.HttpRequestService;
 import com.cm20314.mapapp.services.MapDataService;
+import com.cm20314.mapapp.ui.CanvasView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,6 +101,8 @@ public class MapFragment extends Fragment {
 
     private void drawMapContent(MapDataResponse content){
         System.out.println("Map downloaded.");
+        CanvasView canvasView = binding.getRoot().findViewById(R.id.map_canvas_view);
+        canvasView.SetMapData(content);
     }
 
     // Replace this method with your actual data source

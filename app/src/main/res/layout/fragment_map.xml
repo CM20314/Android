@@ -7,6 +7,7 @@
     tools:context=".ui.map.MapFragment">
 
     <com.cm20314.mapapp.ui.CanvasView
+        android:id="@+id/map_canvas_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
