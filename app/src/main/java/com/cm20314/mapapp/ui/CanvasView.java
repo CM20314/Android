@@ -46,6 +46,9 @@ public class CanvasView extends View {
     private float previousTranslateX = 0f;
     private float previousTranslateY = 0f;
 
+    float displayWidth;
+    float displayHeight;
+
     private boolean dragged = true;
 
     private Display display;
@@ -53,7 +56,7 @@ public class CanvasView extends View {
 
         super(context);
         new CanvasView(context, null);
-        init(context);
+
     }
 
     public CanvasView(Context context, AttributeSet attr){
@@ -61,7 +64,6 @@ public class CanvasView extends View {
         init(context);
     }
     private void init(Context context) {
-
         displayMetrics = new DisplayMetrics();
         WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
         Display display = windowManager.getDefaultDisplay();
@@ -150,8 +152,7 @@ public class CanvasView extends View {
 
         //We're going to scale the X and Y coordinates by the same amount
         canvas.scale(scaleFactor, scaleFactor);
-        float displayWidth = displayMetrics.widthPixels;
-        float displayHeight = displayMetrics.heightPixels;
+
 
         //If translateX times -1 is lesser than zero, let's set it to zero. This takes care of the left bound
         if((translateX * -1) < 0) {
@@ -200,23 +201,26 @@ public class CanvasView extends View {
     private void drawBuildings(Canvas canvas){
         Paint paint = new Paint(); // Declare and initialize a Paint object
         paint.setColor(Color.BLACK); // Set the line color to black
+        displayWidth = displayMetrics.widthPixels;
+        displayHeight = displayMetrics.heightPixels;
 
-        try{
             for(Building building : mapData.buildings){
                 for(int i = 0; i < building.polyline.coordinates.size()-1; i++){
                     Coordinate startCoordinate = building.polyline.coordinates.get(i);
                     Coordinate endCoordinate = building.polyline.coordinates.get(i+1);
-                    canvas.drawLine((float) startCoordinate.x, (float) -startCoordinate.y, (float) endCoordinate.x, (float) -endCoordinate.y, paint);
+
+                    float startX = (float) (startCoordinate.x * scaleFactor + translateX);
+                    float startY = (float) (startCoordinate.y * scaleFactor + translateY);
+                    float endX = (float) (endCoordinate.x * scaleFactor + translateX);
+                    float endY = (float) (endCoordinate.y * scaleFactor + translateY);
+
+                    canvas.drawLine(startX, displayHeight - startY, endX, displayHeight-endY, paint);
                 }
+                paint.setTextSize(10);
+                float midX = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble();
+                float midY = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble();
+                canvas.drawText(building.shortName, midX, displayHeight - midY, paint);
             }
-
-        }
-        catch(Exception ex){
-            System.out.println("break");
-
-
-        }
-
 
     }
 }
