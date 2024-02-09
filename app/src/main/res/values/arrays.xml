@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name = "colourModeArray">
+        <item> System Default </item>
+        <item> Light Mode </item>
+        <item> Dark Mode </item>
+        <item> High Contrast </item>
+    </string-array>
+
+    <string-array name = "arrayValues">
+        <item> 1 </item>
+        <item> 2 </item>
+        <item> 3 </item>
+        <item> 4 </item>
+    </string-array>
+
+</resources>
