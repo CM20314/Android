@@ -1,8 +1,17 @@
 package com.cm20314.mapapp.ui;
 
+import static android.view.MotionEvent.ACTION_DOWN;
+import static android.view.MotionEvent.ACTION_MASK;
+import static android.view.MotionEvent.ACTION_MOVE;
+import static android.view.MotionEvent.ACTION_POINTER_UP;
+import static android.view.MotionEvent.ACTION_UP;
+
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.RectF;
 import android.graphics.drawable.ShapeDrawable;
 import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
@@ -15,211 +24,232 @@ import android.graphics.Color;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.models.Building;
 import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.models.MapDataResponse;
 
+import java.util.OptionalDouble;
+
 public class CanvasView extends View {
     private MapDataResponse mapData;
-    private DisplayMetrics displayMetrics;
-    //Fields
-    private static float MIN_ZOOM = 1f;
-    private static float MAX_ZOOM = 5f;
-    private float scaleFactor = 1.f;
-    private ScaleGestureDetector detector;
-    //These constants specify the mode that we're in
-    private static int NONE = 0;
-    private static int DRAG = 1;
-    private static int ZOOM = 2;
-    private int mode;
-    //These two variables keep track of the X and Y coordinate of the finger when it first
-    //touches the screen
-    private float startX = 0f;
-    private float startY = 0f;
-    //These two variables keep track of the amount we need to translate the canvas along the X
-    //and the Y coordinate
-    private float translateX = 0f;
-    private float translateY = 0f;
-    //These two variables keep track of the amount we translated the X and Y coordinates, the last time we
-    //panned.
-    private float previousTranslateX = 0f;
-    private float previousTranslateY = 0f;
+    private Paint paint = new Paint(); // Paint object for coloring shapes
+    private float radius = 100f; // Radius of circles to be drawn
 
-    float displayWidth;
-    float displayHeight;
+    private float initX = 0f ;// See onTouchEvent
+    private float initY = 0f ;// See onTouchEvent
 
-    private boolean dragged = true;
+    private float canvasX = 0f; // x-coord of canvas center
+    private float canvasY = 0f; // y-coord of canvas center
+    private float dispWidth = 0f; // (Supposed to be) width of entire canvas
+    private float dispHeight = 0f ;// (Supposed to be) height of entire canvas
 
-    private Display display;
-    public CanvasView(Context context) {
+    private boolean dragging = false; // May be unnecessary
+    private boolean firstDraw = true;
 
-        super(context);
-        new CanvasView(context, null);
+    // Detector for scaling gestures (i.e. pinching or double tapping
+    private ScaleGestureDetector detector = new ScaleGestureDetector(getContext(), new ScaleListener());
+    private float scaleFactor = 2f; // Zoom level (initial value is 1x)
 
+    private float MIN_ZOOM = 1f;
+    private float MAX_ZOOM  = 10f;
+
+    private double maxWidth = -1;
+
+    private double maxHeight = -1;
+
+    private double PADDING = 200;
+
+    public CanvasView(Context context, @Nullable AttributeSet attrs) {
+        super(context, attrs);
     }
 
-    public CanvasView(Context context, AttributeSet attr){
-        super(context, attr);
-        init(context);
-    }
-    private void init(Context context) {
-        displayMetrics = new DisplayMetrics();
-        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
-        Display display = windowManager.getDefaultDisplay();
-        display.getMetrics(displayMetrics);
-        detector = new ScaleGestureDetector(getContext(), new ScaleListener());
+    @Override
+    protected void onDraw(@NonNull Canvas canvas) {
+        super.onDraw(canvas);
+
+        canvas.save();// save() and restore() are used to reset canvas data after each draw
+        // Set the canvas origin to the center of the screen only on the first time onDraw is called
+        //  (otherwise it'll break the panning code)
+        if (firstDraw) {
+            canvasX = 0;
+            canvasY = 0;
+            firstDraw = false;
+        }
+        canvas.scale(scaleFactor, scaleFactor) ;// Scale the canvas according to scaleFactor
+
+        // Just draw a bunch of circles (this is for testing panning and zooming
+        paint.setStyle(Paint.Style.FILL);
+        paint.setColor(Color.parseColor("#000000"));
+        canvas.translate(canvasX, canvasY);
+        drawBuildings(canvas);
+//        canvas.drawCircle(0f,0f,radius,paint);
+//        for (int i = 2; i<=40; i+=2) {
+//            canvas.drawCircle(radius*i,0f,radius,paint);
+//            canvas.drawCircle(-radius*i,0f,radius,paint);
+//            canvas.drawCircle(0f,radius*i,radius,paint);
+//            canvas.drawCircle(0f,-radius*i,radius,paint);
+//            canvas.drawCircle(radius*i,radius*i,radius,paint);
+//            canvas.drawCircle(radius*i,-radius*i,radius,paint);
+//            canvas.drawCircle(-radius*i,radius*i,radius,paint);
+//            canvas.drawCircle(-radius*i,-radius*i,radius,paint);
+//        }
+
+        canvas.restore();
+
+        dispWidth = getWidth();
+        dispHeight = getHeight();
     }
 
+    @Override
     public boolean onTouchEvent(MotionEvent event) {
+        float x = event.getX();
+        float y = event.getY();
+        System.out.print(event.getSource());
+        System.out.print(event.getAction());
 
-        switch (event.getAction() & MotionEvent.ACTION_MASK) {
-
-            case MotionEvent.ACTION_DOWN:
-                mode = DRAG;
-
-                //We assign the current X and Y coordinate of the finger to startX and startY minus the previously translated
-                //amount for each coordinates This works even when we are translating the first time because the initial
-                //values for these two variables is zero.
-                startX = event.getX() - previousTranslateX;
-                startY = event.getY() - previousTranslateY;
+        switch (event.getAction() & ACTION_MASK) {
+            case ACTION_DOWN:
+                // Might not be necessary; check out later
+                dragging = true;
+                // We want to store the coords of the user's finger as it is before they move
+                //  in order to calculate dx and dy
+                initX = x;
+                initY = y;
                 break;
 
-            case MotionEvent.ACTION_MOVE:
-                translateX = event.getX() - startX;
-                translateY = event.getY() - startY;
+            case ACTION_MOVE:
+                // Self explanatory; the difference in x- and y-coords between successive calls to
+                //  onTouchEvent
+                float dx = x - initX;
+                float dy = y - initY;
 
-                //We cannot use startX and startY directly because we have adjusted their values using the previous translation values.
-                //This is why we need to add those values to startX and startY so that we can get the actual coordinates of the finger.
-                double distance = Math.sqrt(Math.pow(event.getX() - (startX + previousTranslateX), 2) +
-                        Math.pow(event.getY() - (startY + previousTranslateY), 2)
-                );
+                if (dragging) {
+                    // Move the canvas dx units right and dy units down
+                    // dx and dy are divided by scaleFactor so that panning speeds are consistent
+                    //  with the zoom level
+                    canvasX += dx/scaleFactor;
+                    if (maxWidth !=-1){
+                        if(canvasX>0+PADDING){
+                      //      canvasX= (float) (0+PADDING);
+                        }
+                        else if(canvasX<-maxWidth+(getWidth()-PADDING)/scaleFactor){
+                        //   canvasX = (float) ((float)-maxWidth+(getWidth()-PADDING)/scaleFactor);
 
-                if(distance > 0) {
-                    dragged = true;
+                        }
+                    }
+
+                    canvasY += dy/scaleFactor;
+                    if (maxHeight !=-1){
+                        if(canvasY>0+PADDING){
+                            canvasY= (float) (0+PADDING);
+                        }
+                        else if(canvasY<-maxHeight+(getHeight()-PADDING)/scaleFactor){
+                            canvasY = (float) ((float)-maxHeight+(getHeight()-PADDING)/scaleFactor);
+
+
+                        }
+                    }
+
+                    invalidate(); // Re-draw the canvas
+
+                    // Change initX and initY to the new x- and y-coords
+                    initX = x;
+                    initY = y;
                 }
-
-                break;
-
-            case MotionEvent.ACTION_POINTER_DOWN:
-                mode = ZOOM;
-                break;
-
-            case MotionEvent.ACTION_UP:
-                mode = NONE;
-                dragged = false;
-
-                //All fingers went up, so let's save the value of translateX and translateY into previousTranslateX and
-                //previousTranslate
-                previousTranslateX = translateX;
-                previousTranslateY = translateY;
-                break;
-
-            case MotionEvent.ACTION_POINTER_UP:
-                mode = DRAG;
-
-                //This is not strictly necessary; we save the value of translateX and translateY into previousTranslateX
-                //and previousTranslateY when the second finger goes up
-                previousTranslateX = translateX;
-                previousTranslateY = translateY;
-                break;
+            break;
+        case ACTION_POINTER_UP:
+                // This sets initX and initY to the position of the pointer finger so that the
+                //  screen doesn't jump when it's lifted with the main finger still down
+                initX = x;
+                initY = y;
+            break;
+            case ACTION_UP:
+                dragging = false; // Again, may be unnecessary
         }
 
-        detector.onTouchEvent(event);
-
-        //We redraw the canvas only in the following cases:
-        //
-        // o The mode is ZOOM
-        //        OR
-        // o The mode is DRAG and the scale factor is not equal to 1 (meaning we have zoomed) and dragged is
-        //   set to true (meaning the finger has actually moved)
-        if ((mode == DRAG && scaleFactor != 1f && dragged) || mode == ZOOM) {
-            invalidate();
-            dragged = false;
-        }
+        detector.onTouchEvent(event); // Listen for scale gestures (i.e. pinching or double tap+drag
 
         return true;
     }
 
-
-
-    protected void onDraw(Canvas canvas) {
-        super.onDraw(canvas);
-
-        if(mapData == null) return;
-
-        canvas.save();
-
-        //We're going to scale the X and Y coordinates by the same amount
-        canvas.scale(scaleFactor, scaleFactor);
-
-
-        //If translateX times -1 is lesser than zero, let's set it to zero. This takes care of the left bound
-        if((translateX * -1) < 0) {
-            translateX = 0;
-        }
-        //This is where we take care of the right bound. We compare translateX times -1 to (scaleFactor - 1) * displayWidth.
-        //If translateX is greater than that value, then we know that we've gone over the bound. So we set the value of
-        //translateX to (1 - scaleFactor) times the display width. Notice that the terms are interchanged; it's the same
-        //as doing -1 * (scaleFactor - 1) * displayWidth
-        else if((translateX * -1) > (scaleFactor - 1) * displayWidth) {
-            translateX = (1 - scaleFactor) * displayWidth;
-        }
-
-        if(translateY * -1 < 0) {
-            translateY = 0;
-        }
-
-
-        //We do the exact same thing for the bottom bound, except in this case we use the height of the display
-        else if((translateY * -1) > (scaleFactor - 1) * displayHeight) {
-            translateY = (1 - scaleFactor) * displayHeight;
-        }
-
-        //We need to divide by the scale factor here, otherwise we end up with excessive panning based on our zoom level
-        //because the translation amount also gets scaled according to how much we've zoomed into the canvas.
-        canvas.translate(translateX / scaleFactor, translateY / scaleFactor);
-        //Line
-        drawBuildings(canvas);
-
-        canvas.restore();
-    }
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
-        public boolean onScale(ScaleGestureDetector detector) {
+        public boolean onScale(@NonNull ScaleGestureDetector detector) {
+            // Self-explanatory
             scaleFactor *= detector.getScaleFactor();
+            // If scaleFactor is less than 0.5x, default to 0.5x as a minimum. Likewise, if
+            //  scaleFactor is greater than 10x, default to 10x zoom as a maximum.
             scaleFactor = Math.max(MIN_ZOOM, Math.min(scaleFactor, MAX_ZOOM));
+
+            invalidate(); // Re-draw the canvas
+
             return true;
         }
     }
 
     public void SetMapData(MapDataResponse data){
         mapData = data;
+        maxWidth = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.x).max().orElse(0)).max().orElse(0);
+        maxHeight = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.y).max().orElse(0)).max().orElse(0);
         invalidate();
     }
 
     private void drawBuildings(Canvas canvas){
         Paint paint = new Paint(); // Declare and initialize a Paint object
-        paint.setColor(Color.BLACK); // Set the line color to black
-        displayWidth = displayMetrics.widthPixels;
-        displayHeight = displayMetrics.heightPixels;
+        paint.setStrokeWidth(4 / scaleFactor);
 
-            for(Building building : mapData.buildings){
-                for(int i = 0; i < building.polyline.coordinates.size()-1; i++){
+        if( mapData == null) return;
+
+        for(Building building : mapData.buildings){
+            paint.setColor(Color.GRAY); // Set the line color to black
+            Path vectorPath = new Path();
+                for(int i = 0; i < building.polyline.coordinates.size(); i++){
                     Coordinate startCoordinate = building.polyline.coordinates.get(i);
-                    Coordinate endCoordinate = building.polyline.coordinates.get(i+1);
+                    int secondCoordIndex = i != building.polyline.coordinates.size() - 1 ? i + 1 : 0;
+                    Coordinate endCoordinate = building.polyline.coordinates.get(secondCoordIndex);
 
-                    float startX = (float) (startCoordinate.x * scaleFactor + translateX);
-                    float startY = (float) (startCoordinate.y * scaleFactor + translateY);
-                    float endX = (float) (endCoordinate.x * scaleFactor + translateX);
-                    float endY = (float) (endCoordinate.y * scaleFactor + translateY);
+                    float startX = (float) (startCoordinate.x);
+                    float startY = (float) (startCoordinate.y);
+                    float endX = (float) (endCoordinate.x);
+                    float endY = (float) (endCoordinate.y);
 
-                    canvas.drawLine(startX, displayHeight - startY, endX, displayHeight-endY, paint);
+                    if(i == 0){
+                        vectorPath.moveTo(startX, startY);
+                    }
+                    vectorPath.lineTo(endX, endY);
+                    //canvas.drawLine(startX, startY, endX, endY, paint);
                 }
-                paint.setTextSize(10);
+                vectorPath.close();
+
+            Paint fillPaint = new Paint();
+            fillPaint.setStyle(Paint.Style.FILL);
+            fillPaint.setColor(Color.GREEN);
+            fillPaint.setAntiAlias(true);
+            fillPaint.setDither(true);
+
+            Paint borderPaint = new Paint();
+            borderPaint.setStyle(Paint.Style.STROKE);
+            borderPaint.setStrokeWidth(3 / scaleFactor);
+            borderPaint.setColor(Color.BLACK);
+            borderPaint.setAntiAlias(true);
+            borderPaint.setDither(true);
+
+            // First draw the fill path.
+            canvas.drawPath(vectorPath, fillPaint);
+// Then overlap this with the border path.
+            canvas.drawPath(vectorPath, borderPaint);
+
+                paint.setTextSize(7);
+                paint.setColor(Color.BLACK);
+                paint.setTextAlign(Paint.Align.CENTER);
+
                 float midX = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble();
                 float midY = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble();
-                canvas.drawText(building.shortName, midX, displayHeight - midY, paint);
+                canvas.drawText(building.shortName, midX, midY, paint);
             }
 
     }
