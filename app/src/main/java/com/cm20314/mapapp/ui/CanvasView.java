@@ -32,6 +32,8 @@ import com.cm20314.mapapp.models.Building;
 import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.models.MapDataResponse;
 
+import java.util.OptionalDouble;
+
 public class CanvasView extends View {
     private MapDataResponse mapData;
     private Paint paint = new Paint(); // Paint object for coloring shapes
@@ -50,10 +52,16 @@ public class CanvasView extends View {
 
     // Detector for scaling gestures (i.e. pinching or double tapping
     private ScaleGestureDetector detector = new ScaleGestureDetector(getContext(), new ScaleListener());
-    private float scaleFactor = 1f; // Zoom level (initial value is 1x)
+    private float scaleFactor = 2f; // Zoom level (initial value is 1x)
 
     private float MIN_ZOOM = 1f;
     private float MAX_ZOOM  = 10f;
+
+    private double maxWidth = -1;
+
+    private double maxHeight = -1;
+
+    private double PADDING = 200;
 
     public CanvasView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -100,15 +108,8 @@ public class CanvasView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
         float y = event.getY();
-
-        //@TODO: HIGH PRIORITY
-        // - Prevent user from scrolling past ends of canvas
-
-        //@TODO: LOW PRIORITY
-        // - Add functionality such that initX and initY snap to the position of whichever
-        //    finger is up first, be it pointer or main (to prevent jumpiness)
-        // - Make sure that when the user zooms in or out the focal point is the midpoint of a line
-        //    connecting the main and pointer fingers
+        System.out.print(event.getSource());
+        System.out.print(event.getAction());
 
         switch (event.getAction() & ACTION_MASK) {
             case ACTION_DOWN:
@@ -131,7 +132,27 @@ public class CanvasView extends View {
                     // dx and dy are divided by scaleFactor so that panning speeds are consistent
                     //  with the zoom level
                     canvasX += dx/scaleFactor;
+                    if (maxWidth !=-1){
+                        if(canvasX>0+PADDING){
+                      //      canvasX= (float) (0+PADDING);
+                        }
+                        else if(canvasX<-maxWidth+(getWidth()-PADDING)/scaleFactor){
+                        //   canvasX = (float) ((float)-maxWidth+(getWidth()-PADDING)/scaleFactor);
+
+                        }
+                    }
+
                     canvasY += dy/scaleFactor;
+                    if (maxHeight !=-1){
+                        if(canvasY>0+PADDING){
+                            canvasY= (float) (0+PADDING);
+                        }
+                        else if(canvasY<-maxHeight+(getHeight()-PADDING)/scaleFactor){
+                            canvasY = (float) ((float)-maxHeight+(getHeight()-PADDING)/scaleFactor);
+
+
+                        }
+                    }
 
                     invalidate(); // Re-draw the canvas
 
@@ -172,17 +193,20 @@ public class CanvasView extends View {
 
     public void SetMapData(MapDataResponse data){
         mapData = data;
+        maxWidth = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.x).max().orElse(0)).max().orElse(0);
+        maxHeight = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.y).max().orElse(0)).max().orElse(0);
         invalidate();
     }
 
     private void drawBuildings(Canvas canvas){
         Paint paint = new Paint(); // Declare and initialize a Paint object
-        paint.setColor(Color.GRAY); // Set the line color to black
         paint.setStrokeWidth(4 / scaleFactor);
 
         if( mapData == null) return;
 
         for(Building building : mapData.buildings){
+            paint.setColor(Color.GRAY); // Set the line color to black
+            Path vectorPath = new Path();
                 for(int i = 0; i < building.polyline.coordinates.size(); i++){
                     Coordinate startCoordinate = building.polyline.coordinates.get(i);
                     int secondCoordIndex = i != building.polyline.coordinates.size() - 1 ? i + 1 : 0;
@@ -193,10 +217,33 @@ public class CanvasView extends View {
                     float endX = (float) (endCoordinate.x);
                     float endY = (float) (endCoordinate.y);
 
-                    canvas.drawLine(startX, startY, endX, endY, paint);
+                    if(i == 0){
+                        vectorPath.moveTo(startX, startY);
+                    }
+                    vectorPath.lineTo(endX, endY);
+                    //canvas.drawLine(startX, startY, endX, endY, paint);
                 }
+                vectorPath.close();
 
-                paint.setTextSize(15);
+            Paint fillPaint = new Paint();
+            fillPaint.setStyle(Paint.Style.FILL);
+            fillPaint.setColor(Color.GREEN);
+            fillPaint.setAntiAlias(true);
+            fillPaint.setDither(true);
+
+            Paint borderPaint = new Paint();
+            borderPaint.setStyle(Paint.Style.STROKE);
+            borderPaint.setStrokeWidth(3 / scaleFactor);
+            borderPaint.setColor(Color.BLACK);
+            borderPaint.setAntiAlias(true);
+            borderPaint.setDither(true);
+
+            // First draw the fill path.
+            canvas.drawPath(vectorPath, fillPaint);
+// Then overlap this with the border path.
+            canvas.drawPath(vectorPath, borderPaint);
+
+                paint.setTextSize(7);
                 paint.setColor(Color.BLACK);
                 paint.setTextAlign(Paint.Align.CENTER);
 
