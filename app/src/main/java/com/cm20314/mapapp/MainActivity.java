@@ -1,12 +1,17 @@
 package com.cm20314.mapapp;
 
 import android.content.SharedPreferences;
+
+import android.content.pm.PackageManager;
+
 import android.os.Bundle;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -17,6 +22,8 @@ import com.cm20314.mapapp.databinding.ActivityMainBinding;
 import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
+import android.Manifest;
+
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -41,5 +48,31 @@ public class MainActivity extends AppCompatActivity  {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(binding.navView, navController);
+
+        //getting location permissions
+        if (!permissionsGranted()){
+            getLocationPermissions();
+        }
+    }
+
+    /**
+     * Checks for coarse and fine location permissions
+     * @return True if permissions are granted
+     */
+    private boolean permissionsGranted(){
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+    /**
+     * Requests location permissions from the user
+     */
+    private void getLocationPermissions(){
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
+                80085);
     }
 }

@@ -5,4 +5,13 @@ public class Coordinate {
     public double y;
     public int z;
     public int id;
+
+    public Coordinate(){
+
+    }
+
+    public Coordinate(double x, double y){
+        this.x = x;
+        this.y = y;
+    }
 }
