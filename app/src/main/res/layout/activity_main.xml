@@ -34,4 +34,14 @@
         android:layout_alignBottom="@id/nav_view"
         android:layout_centerHorizontal="true"
         android:background="@drawable/semicircle_divider" />
+
+    <ImageView
+        android:id="@+id/nav_bar_logo"
+        android:layout_width="90dp"
+        android:layout_height="90dp"
+        android:translationZ="11dp"
+        android:layout_alignTop="@id/nav_bar_divider"
+        android:layout_centerHorizontal="true"
+        android:background="@drawable/ic_launcher_foreground"
+        android:contentDescription="@string/nav_bar_logo_desc"/>
 </RelativeLayout>
