@@ -85,6 +85,17 @@
                 android:dropDownWidth="300dp"
                 android:hint="@string/end_search_placeholder"
                 android:popupBackground="#eff6ff" />
+
+            <ImageView
+                android:id="@+id/favourite_button"
+                android:layout_width="32dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:layout_alignEnd="@id/end_search_view"
+                android:src="@drawable/ic_star_red_24dp"
+                android:contentDescription="@string/search_icon_desc"/>
+
         </RelativeLayout>
         <LinearLayout
             android:layout_width="match_parent"
