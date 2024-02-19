@@ -1,6 +1,7 @@
 package com.cm20314.mapapp.ui.map;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -27,13 +28,16 @@ import com.cm20314.mapapp.databinding.FragmentMapBinding;
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.Container;
 import com.cm20314.mapapp.models.MapDataResponse;
+import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.HttpRequestService;
 import com.cm20314.mapapp.services.MapDataService;
 import com.cm20314.mapapp.ui.CanvasView;
 
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
 
@@ -45,11 +49,18 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     private LinearLayout favouritesLayout;
     private LinearLayout recentsLayout;
     private ImageView backButton;
+    private ImageView favouriteButton;
+
+    private MapViewModel mapViewModel;
+
+    private SharedPreferences preferences;
     private final MapDataService mapDataService = new MapDataService();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        //MapViewModel mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
+        mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
+
+        preferences = getContext().getSharedPreferences("favourites_and_recents", Context.MODE_PRIVATE);
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
         ViewGroup root = binding.getRoot();
@@ -65,6 +76,8 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
         backButton = root.findViewById(R.id.start_placeholder_icon);
 
+        favouriteButton = root.findViewById(R.id.favourite_button);
+
         // Set up your data source and adapter for suggestions
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
                 android.R.layout.simple_dropdown_item_1line, getYourSuggestionsData());
@@ -73,14 +86,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         endSearchView.setOnItemClickListener(this);
 
         backButton.setOnClickListener(this);
-
-        ArrayList<String> dummyRecentValues = new ArrayList<>();
-        dummyRecentValues.add("CB 1.12");
-        dummyRecentValues.add("1W");
-        dummyRecentValues.add("East Building");
-
-        ConfigureFavourites(new ArrayList<Container>());
-        ConfigureRecents(dummyRecentValues);
+        favouriteButton.setOnClickListener(this);
 
         return root;
     }
@@ -115,8 +121,14 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         });
     }
 
-    private void ConfigureFavourites(List<Container> containers){
-        for(Container c : containers){
+    private void ConfigureFavourites(Set<String> containerNames){
+        int childrenCount = favouritesLayout.getChildCount();
+        if(childrenCount > 1){
+            for (int i = 1; i < childrenCount; i++){
+                favouritesLayout.removeViewAt(1);
+            }
+        }
+        for(String c : containerNames){
             Button btn = new Button(getContext());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
                     (LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -133,15 +145,24 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             btn.setBackground(getResources().getDrawable(R.drawable.favs_recent_buttons_style));
             btn.setEllipsize(TextUtils.TruncateAt.END);
             btn.setMaxLines(1);
-            btn.setText(c.longName);
+            btn.setText(c);
             btn.setBackgroundResource(R.drawable.favs_recent_buttons_style);
-            btn.setOnClickListener(v -> setAutoCompleteText(c.longName));
+            btn.setOnClickListener(v -> {
+                mapViewModel.destination = c;
+                setAutoCompleteText(c);
+            });
             btn.setTextColor(getResources().getColor(com.google.android.material.R.color.design_default_color_on_primary));
             favouritesLayout.addView(btn);
         }
     }
 
     private void ConfigureRecents(List<String> recentSearches){
+        int childrenCount = recentsLayout.getChildCount();
+        if(childrenCount > 1){
+            for (int i = 1; i < childrenCount; i++){
+                recentsLayout.removeViewAt(1);
+            }
+        }
         for(String recentSearch : recentSearches){
             Button btn = new Button(getContext());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
@@ -160,7 +181,10 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             btn.setEllipsize(TextUtils.TruncateAt.END);
             btn.setMaxLines(1);
             btn.setText(recentSearch);
-            btn.setOnClickListener(v -> setAutoCompleteText(recentSearch));
+            btn.setOnClickListener(v -> {
+                mapViewModel.destination = recentSearch;
+                setAutoCompleteText(recentSearch);
+            });
             btn.setBackgroundResource(R.drawable.favs_recent_buttons_style);
             btn.setTextColor(getResources().getColor(com.google.android.material.R.color.design_default_color_on_primary));
             recentsLayout.addView(btn);
@@ -219,12 +243,59 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         startSearchLayout.setVisibility(View.GONE);
         favouritesLayout.setVisibility(View.VISIBLE);
         recentsLayout.setVisibility(View.VISIBLE);
+        favouriteButton.setVisibility(View.GONE);
+        ConfigureFavourites(preferences.getStringSet(Constants.FAVOURITES_SET_KEY,new HashSet<>()));
+        ConfigureRecents(getRecents());
     }
 
     private void SwitchToStartEndSelectionUI(){
         startSearchLayout.setVisibility(View.VISIBLE);
         favouritesLayout.setVisibility(View.GONE);
         recentsLayout.setVisibility(View.GONE);
+        favouriteButton.setVisibility(View.VISIBLE);
+
+        if (IsFavourite(mapViewModel.destination)){
+            favouriteButton.setImageResource(R.drawable.ic_star_red_filled_24dp);
+        }
+
+        else{
+            favouriteButton.setImageResource(R.drawable.ic_star_red_24dp);
+        }
+
+       AddToRecents(mapViewModel.destination);
+    }
+
+    private void AddToRecents(String destination) {
+
+        SharedPreferences.Editor editor = preferences.edit();
+        String recents1 = preferences.getString(Constants.RECENTS1_KEY,"");
+        String recents2 = preferences.getString(Constants.RECENTS2_KEY,"");
+        String recents3 = preferences.getString(Constants.RECENTS3_KEY,"");
+
+        if (destination.equals(recents1) || destination.equals(recents2) || destination.equals(recents3)){
+            return;
+        }
+
+        else{
+            editor.putString(Constants.RECENTS1_KEY,recents2);
+            editor.putString(Constants.RECENTS2_KEY,recents3);
+            editor.putString(Constants.RECENTS3_KEY,destination);
+        }
+
+        editor.apply();
+    }
+
+    private List<String> getRecents(){
+        String recents1 = preferences.getString(Constants.RECENTS1_KEY,"");
+        String recents2 = preferences.getString(Constants.RECENTS2_KEY,"");
+        String recents3 = preferences.getString(Constants.RECENTS3_KEY,"");
+
+        ArrayList<String> recents = new ArrayList<>();
+        if (!recents1.equals("")) recents.add(recents3);
+        if (!recents2.equals("")) recents.add(recents2);
+        if (!recents3.equals("")) recents.add(recents1);
+
+        return recents;
     }
 
     @Override
@@ -236,6 +307,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         HideKeyboardAndDisableFocus(endSearchView);
+        mapViewModel.destination = (String) parent.getItemAtPosition(position);
         SwitchUIToState(2);
     }
 
@@ -243,6 +315,42 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     public void onClick(View v) {
         if(v.getId() == R.id.start_placeholder_icon){
             SwitchUIToState(1);
+        } else if (v.getId() == R.id.favourite_button) {
+            ToggleFavourite();
+        }
+    }
+
+    private void ToggleFavourite() {
+
+        if (mapViewModel.destination == null) return;
+        SharedPreferences.Editor editor = preferences.edit();
+        Set<String> favourites = preferences.getStringSet(Constants.FAVOURITES_SET_KEY,new HashSet<String>());
+        HashSet<String> favouritesEditable = new HashSet<>(favourites);
+
+        if (favouritesEditable.contains(mapViewModel.destination)){
+            favouritesEditable.remove(mapViewModel.destination);
+            favouriteButton.setImageResource(R.drawable.ic_star_red_24dp);
+        }
+
+        else{
+           favouritesEditable.add(mapViewModel.destination);
+           favouriteButton.setImageResource((R.drawable.ic_star_red_filled_24dp));
+        }
+
+        editor.putStringSet(Constants.FAVOURITES_SET_KEY,favouritesEditable);
+
+        editor.apply();
+    }
+
+    private boolean IsFavourite(String containerName){
+
+        Set<String> favourites = preferences.getStringSet(Constants.FAVOURITES_SET_KEY,new HashSet<String>());
+        if (favourites.contains(mapViewModel.destination)){
+            return true;
+        }
+
+        else{
+            return false;
         }
     }
 }
