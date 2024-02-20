@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,6 +30,7 @@ import com.cm20314.mapapp.databinding.FragmentMapBinding;
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.Container;
 import com.cm20314.mapapp.models.MapDataResponse;
+import com.cm20314.mapapp.models.MapSearchResponse;
 import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.HttpRequestService;
 import com.cm20314.mapapp.services.MapDataService;
@@ -39,7 +42,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener {
+public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, TextWatcher {
 
     private FragmentMapBinding binding;
     private AutoCompleteTextView startSearchView;
@@ -55,6 +58,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private SharedPreferences preferences;
     private final MapDataService mapDataService = new MapDataService();
+    private List<String> suggestionsList = new ArrayList<>();
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -80,10 +84,11 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
         // Set up your data source and adapter for suggestions
         ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_dropdown_item_1line, getYourSuggestionsData());
+                android.R.layout.simple_dropdown_item_1line, getSuggestions());
 
         endSearchView.setAdapter(adapter);
         endSearchView.setOnItemClickListener(this);
+        endSearchView.addTextChangedListener(this);
 
         backButton.setOnClickListener(this);
         favouriteButton.setOnClickListener(this);
@@ -211,21 +216,8 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     }
 
     // Replace this method with your actual data source
-    private List<String> getYourSuggestionsData() {
-        List<String> suggestions = new ArrayList<>();
-        // Populate your suggestions list here
-        suggestions.add("CB 1.10");
-        suggestions.add("CB 1.11");
-        suggestions.add("1W 2.101");
-        suggestions.add("8W 2.1");
-        suggestions.add("8W 1.1");
-        suggestions.add("10W 2.47");
-        suggestions.add("CB 2.10");
-        suggestions.add("CB 2.11");
-        suggestions.add("CB 2.12");
-        suggestions.add("CB 2.13");
-        // Add more suggestions as needed
-        return suggestions;
+    private List<String> getSuggestions() {
+        return suggestionsList;
     }
 
     private void SwitchUIToState(int state){
@@ -352,5 +344,33 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         else{
             return false;
         }
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        mapDataService.searchContainers(
+                endSearchView.getText().toString(), new IHttpRequestCallback<MapSearchResponse>() {
+                    @Override
+                    public void onCompleted(HttpRequestService.HttpRequestResponse<MapSearchResponse> response) {
+                        suggestionsList = response.Content.response;
+                        endSearchView.refreshAutoCompleteResults();
+                    }
+
+                    @Override
+                    public void onException() {
+
+                    }
+                }
+        );
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+
     }
 }
