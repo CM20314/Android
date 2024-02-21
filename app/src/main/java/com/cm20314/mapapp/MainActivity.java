@@ -1,11 +1,14 @@
 package com.cm20314.mapapp;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 
 import android.content.pm.PackageManager;
 
 import android.os.Bundle;
 
+import com.cm20314.mapapp.models.Coordinate;
+import com.cm20314.mapapp.services.LocationService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.annotation.Nullable;
@@ -28,6 +31,7 @@ import android.Manifest;
 public class MainActivity extends AppCompatActivity  {
 
     private ActivityMainBinding binding;
+    private Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

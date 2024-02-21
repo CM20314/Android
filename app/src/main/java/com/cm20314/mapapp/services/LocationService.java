@@ -48,13 +48,14 @@ public class LocationService {
      * @return Transformed x and y coordinates
      */
     private float[] transformCoordinates(float[] latAndLong){
+        float[] originalCoordinates = {latAndLong[0], latAndLong[1], 1};
         float[] output = {0,0, 0};
         float count = 0;
 
-        for (int i = 0; i < 2; i++){
-
-            for (int j = 0; i < 2; j++){
-                count += Constants.gpsToCoordinateMatrix[j][i] * latAndLong[j];
+        for (int i = 0; i < 3; i++){
+            count = 0;
+            for (int j = 0; j < 3; j++){
+                count += Constants.gpsToCoordinateMatrix[i][j] * originalCoordinates[j];
             }
             output[i] = count;
         }
@@ -72,8 +73,8 @@ public class LocationService {
      */
     public Coordinate getLocation(){
         float[] latAndLong = getLatAndLong();
-        latAndLong[0] = latAndLong[0] - Constants.gpsOffset[0];
-        latAndLong[1] = latAndLong[1] - Constants.gpsOffset[1];
+//        latAndLong[0] = latAndLong[0] - Constants.gpsOffset[0];
+//        latAndLong[1] = latAndLong[1] - Constants.gpsOffset[1];
         float[] coordinateValues = transformCoordinates(latAndLong);
         return new Coordinate(coordinateValues[0], coordinateValues[1]);
     }
