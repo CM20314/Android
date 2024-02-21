@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId = "com.cm20314.mapapp"
-        minSdk = 30
+        minSdk = 34
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"

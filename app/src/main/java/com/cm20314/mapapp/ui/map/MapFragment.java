@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, TextWatcher {
 
@@ -59,6 +60,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     private SharedPreferences preferences;
     private final MapDataService mapDataService = new MapDataService();
     private List<String> suggestionsList = new ArrayList<>();
+    private ArrayAdapter<String> endSearchViewAdapter;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -83,10 +85,10 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouriteButton = root.findViewById(R.id.favourite_button);
 
         // Set up your data source and adapter for suggestions
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(requireContext(),
-                android.R.layout.simple_dropdown_item_1line, getSuggestions());
+        endSearchViewAdapter = new ArrayAdapter<>(getContext(),
+                android.R.layout.simple_dropdown_item_1line);
 
-        endSearchView.setAdapter(adapter);
+        endSearchView.setAdapter(endSearchViewAdapter);
         endSearchView.setOnItemClickListener(this);
         endSearchView.addTextChangedListener(this);
 
@@ -213,11 +215,6 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         System.out.println("Map downloaded.");
         CanvasView canvasView = binding.getRoot().findViewById(R.id.map_canvas_view);
         canvasView.SetMapData(content);
-    }
-
-    // Replace this method with your actual data source
-    private List<String> getSuggestions() {
-        return suggestionsList;
     }
 
     private void SwitchUIToState(int state){
@@ -353,12 +350,15 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     @Override
     public void onTextChanged(CharSequence s, int start, int before, int count) {
+        if(endSearchView.getText().toString().equals("")) return;
         mapDataService.searchContainers(
                 endSearchView.getText().toString(), new IHttpRequestCallback<MapSearchResponse>() {
                     @Override
                     public void onCompleted(HttpRequestService.HttpRequestResponse<MapSearchResponse> response) {
-                        suggestionsList = response.Content.response;
-                        endSearchView.refreshAutoCompleteResults();
+                        suggestionsList = response.Content.results.stream().map(c -> c.longName).collect(Collectors.toList());
+                        endSearchViewAdapter.clear();
+                        endSearchViewAdapter.addAll(suggestionsList);
+                        endSearchViewAdapter.notifyDataSetChanged();
                     }
 
                     @Override
