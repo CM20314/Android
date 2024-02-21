@@ -6,6 +6,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -36,14 +37,41 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
                 .registerOnSharedPreferenceChangeListener(this);
     }
 
+
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, @Nullable String key) {
-        if (key.equals("stepFreeNav")) {
-            // Handle preference change
-            //String value = sharedPreferences.getString(key, "");
-            //System.out.println("HI");
-            // Do something with the new value
+
+        if (key != null) {
+
+            switch(key) {
+                case "coloursPref":
+                    //Log.d("SettingsFragment", "preference changed: " + key);
+
+                    //gets value of colour mode preference
+                    //1 = system default
+                    //2 = light mode
+                    //3 = dark mode
+                    //4 = high contrast
+                    String colourMode = sharedPreferences.getString("coloursPref", "1");
+                    
+                    //Log.d("SettingsFragment", "colour mode: " + colourMode);
+
+                    break;
+
+                case "stepFreeNav":
+                    //Log.d("SettingsFragment", "preference changed: " + key);
+                    break;
+
+                case "quietRoutesNav":
+                    //Log.d("SettingsFragment", "preference changed: " + key);
+                    break;
+
+                case "textToSpeech":
+                    //Log.d("SettingsFragment", "preference changed: " + key);
+                    break;
+            }
         }
+
     }
 
 //    public View onCreateView(@NonNull LayoutInflater inflater,
