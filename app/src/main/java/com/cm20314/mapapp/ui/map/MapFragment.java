@@ -280,9 +280,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         String recents3 = preferences.getString(Constants.RECENTS3_KEY,"");
 
         ArrayList<String> recents = new ArrayList<>();
-        if (!recents1.equals("")) recents.add(recents3);
+        if (!recents3.equals("")) recents.add(recents3);
         if (!recents2.equals("")) recents.add(recents2);
-        if (!recents3.equals("")) recents.add(recents1);
+        if (!recents1.equals("")) recents.add(recents1);
 
         return recents;
     }
