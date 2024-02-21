@@ -32,16 +32,4 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory
-        app:key   = "privacyCat"
-        app:title = "Privacy">
-
-        <SwitchPreferenceCompat
-            app:key   = "trackLocation"
-            app:title = "Enable location services"/>
-
-        
-
-    </PreferenceCategory>
-
 </PreferenceScreen>
