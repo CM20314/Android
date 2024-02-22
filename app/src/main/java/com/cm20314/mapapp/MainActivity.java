@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.cm20314.mapapp.models.Coordinate;
+import com.cm20314.mapapp.services.ElevationService;
 import com.cm20314.mapapp.services.LocationService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -26,12 +27,16 @@ import com.microsoft.appcenter.AppCenter;
 import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 import android.Manifest;
+import android.view.KeyEvent;
+import android.widget.Toast;
 
 
 public class MainActivity extends AppCompatActivity  {
 
     private ActivityMainBinding binding;
     private Context context;
+
+    private ElevationService elevationService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,8 @@ public class MainActivity extends AppCompatActivity  {
         if (!permissionsGranted()){
             getLocationPermissions();
         }
+
+        elevationService = new ElevationService();
     }
 
     /**
@@ -78,5 +85,26 @@ public class MainActivity extends AppCompatActivity  {
         ActivityCompat.requestPermissions(this,
                 new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},
                 80085);
+    }
+
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    elevationService.increaseElevation();
+                }
+                break;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    elevationService.decreaseElevation();
+                }
+                break;
+        }
+        return true;
     }
 }
