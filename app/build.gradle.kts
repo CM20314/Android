@@ -34,6 +34,7 @@ android {
 
 dependencies {
 
+
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -45,14 +46,28 @@ dependencies {
     implementation("com.microsoft.appcenter:appcenter-analytics:5.0.4")
     implementation("com.microsoft.appcenter:appcenter-crashes:5.0.4")
     testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test:runner:1.4.0")
+    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test:core:1.5.0")
+    androidTestImplementation("androidx.test:core-ktx:1.5.0")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
+    androidTestImplementation("androidx.test:rules:1.4.0")
+    androidTestImplementation("androidx.test:runner:1.4.0")
     implementation("androidx.preference:preference-ktx:1.2.1")
 }
 
 if (project.hasProperty("APPCENTER_KEY")) {
-    android.defaultConfig.buildConfigField("String", "APPCENTER_KEY", "\"${project.findProperty("APPCENTER_KEY")}\"")
+    android.defaultConfig.buildConfigField(
+        "String",
+        "APPCENTER_KEY",
+        "\"${project.findProperty("APPCENTER_KEY")}\""
+    )
 }
 if (project.hasProperty("API_KEY")) {
-    android.defaultConfig.buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY")}\"")
+    android.defaultConfig.buildConfigField(
+        "String",
+        "API_KEY",
+        "\"${project.findProperty("API_KEY")}\""
+    )
 }
