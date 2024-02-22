@@ -103,7 +103,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         super.onViewCreated(view, savedInstanceState);
         loadMapData();
 
-        SwitchUIToState(1);
+            SwitchUIToState(1);
     }
 
     private void loadMapData(){
