@@ -3,7 +3,7 @@ package com.cm20314.mapapp.services;
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.RouteRequestData;
 
-public class PathfindingService {
+public class RoutingService {
     public void requestPath(RouteRequestData requestData,
                             IHttpRequestCallback<Object> callback){
         HttpRequestService<RouteRequestData, Object> httpRequestService = new HttpRequestService<>();

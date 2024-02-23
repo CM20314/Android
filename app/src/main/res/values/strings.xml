@@ -9,4 +9,7 @@
     <string name="canvas_view_desc">Map</string>
     <string name="search_icon_desc">Search icon</string>
     <string name="nav_bar_logo_desc">Navigation bar logo</string>
+
+    <string name="my_location">My Location</string>
+    <string name="get_directions">Get Directions</string>
 </resources>

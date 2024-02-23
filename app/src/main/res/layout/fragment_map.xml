@@ -94,6 +94,7 @@
                 android:layout_marginEnd="5dp"
                 android:layout_alignEnd="@id/end_search_view"
                 android:src="@drawable/ic_star_red_24dp"
+                android:padding="2dp"
                 android:contentDescription="@string/search_icon_desc"/>
 
         </RelativeLayout>
@@ -108,11 +109,12 @@
             android:layout_gravity="center_vertical">
             <ImageView
                 android:id="@+id/favourites_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="match_parent"
-                android:layout_centerVertical="true"
+                android:background="@drawable/favs_recents_icon_style"
                 android:layout_marginEnd="8dp"
-                android:src="@drawable/ic_star_black_24dp"
+                android:src="@drawable/ic_star_black"
+                android:padding="2dp"
                 android:contentDescription="@string/search_icon_desc"/>
 
         </LinearLayout>
@@ -127,14 +129,22 @@
             android:layout_gravity="center_vertical">
             <ImageView
                 android:id="@+id/recents_icon"
-                android:layout_width="wrap_content"
+                android:layout_width="36dp"
                 android:layout_height="match_parent"
-                android:layout_centerVertical="true"
+                android:background="@drawable/favs_recents_icon_style"
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_history_black_24dp"
                 android:contentDescription="@string/search_icon_desc"/>
 
         </LinearLayout>
+        <Button
+            android:id="@+id/get_directions_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/get_directions_button_style"
+            android:layout_margin="8dp"
+            android:text="@string/get_directions"
+            android:textSize="16sp"/>
 
     </LinearLayout>
 

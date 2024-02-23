@@ -8,34 +8,24 @@ import static android.view.MotionEvent.ACTION_UP;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.OvalShape;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
-import android.view.Display;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.graphics.Color;
-import android.view.WindowManager;
-import android.view.WindowMetrics;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.models.Building;
 import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.models.MapDataResponse;
 
-import java.util.OptionalDouble;
-
 public class CanvasView extends View {
     private MapDataResponse mapData;
+    private Coordinate location;
     private Paint paint = new Paint(); // Paint object for coloring shapes
     private float radius = 100f; // Radius of circles to be drawn
 
@@ -62,6 +52,7 @@ public class CanvasView extends View {
     private double maxHeight = -1;
 
     private double PADDING = 200;
+    private int fillColor;
 
     public CanvasView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -191,11 +182,22 @@ public class CanvasView extends View {
         }
     }
 
-    public void SetMapData(MapDataResponse data){
+    public void SetMapData(MapDataResponse data, Coordinate location, int fillColor){
         mapData = data;
+        this.fillColor = fillColor;
+        this.location = location;
         maxWidth = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.x).max().orElse(0)).max().orElse(0);
         maxHeight = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.y).max().orElse(0)).max().orElse(0);
         invalidate();
+    }
+
+    public void UpdateLocation(Coordinate location, boolean invalidateMap){
+        this.location = location;
+        if(invalidateMap) invalidate();
+    }
+
+    public void UpdateLocation(Coordinate location){
+        UpdateLocation(location, true);
     }
 
     private void drawBuildings(Canvas canvas){
@@ -227,7 +229,7 @@ public class CanvasView extends View {
 
             Paint fillPaint = new Paint();
             fillPaint.setStyle(Paint.Style.FILL);
-            fillPaint.setColor(Color.GREEN);
+            fillPaint.setColor(fillColor);
             fillPaint.setAntiAlias(true);
             fillPaint.setDither(true);
 
@@ -251,6 +253,11 @@ public class CanvasView extends View {
                 float midY = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble();
                 canvas.drawText(building.shortName, midX, midY, paint);
             }
+        // Draw location
 
+        paint.setColor(Color.BLUE);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+        canvas.drawCircle((float) location.x, (float) location.y, 5, paint);
     }
 }

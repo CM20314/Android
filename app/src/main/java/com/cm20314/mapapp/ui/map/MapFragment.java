@@ -2,7 +2,10 @@ package com.cm20314.mapapp.ui.map;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationListener;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextUtils;
@@ -22,6 +25,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -31,10 +35,14 @@ import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.Container;
 import com.cm20314.mapapp.models.MapDataResponse;
 import com.cm20314.mapapp.models.MapSearchResponse;
+import com.cm20314.mapapp.models.RouteRequestData;
 import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.HttpRequestService;
+import com.cm20314.mapapp.services.LocationService;
 import com.cm20314.mapapp.services.MapDataService;
+import com.cm20314.mapapp.services.RoutingService;
 import com.cm20314.mapapp.ui.CanvasView;
+import com.microsoft.appcenter.utils.storage.SharedPreferencesManager;
 
 import java.sql.Array;
 import java.util.ArrayList;
@@ -59,8 +67,12 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private SharedPreferences preferences;
     private final MapDataService mapDataService = new MapDataService();
+    private LocationService locationService;
+    private final RoutingService routingService = new RoutingService();
     private List<String> suggestionsList = new ArrayList<>();
     private ArrayAdapter<String> endSearchViewAdapter;
+    private CanvasView canvasView;
+    private Button getDirectionsButton;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -70,6 +82,16 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
         binding = FragmentMapBinding.inflate(inflater, container, false);
         ViewGroup root = binding.getRoot();
+
+        locationService = new LocationService(getContext(), new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+                canvasView.UpdateLocation(locationService.getLocation());
+            }
+        });
+
+        canvasView = root.findViewById(R.id.map_canvas_view);
+        canvasView.UpdateLocation(locationService.getLocation(), false);
 
         startSearchView = root.findViewById(R.id.start_search_view);
         endSearchView = root.findViewById(R.id.end_search_view);
@@ -83,6 +105,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         backButton = root.findViewById(R.id.start_placeholder_icon);
 
         favouriteButton = root.findViewById(R.id.favourite_button);
+
+        getDirectionsButton = root.findViewById(R.id.get_directions_button);
+        getDirectionsButton.setOnClickListener(this);
 
         // Set up your data source and adapter for suggestions
         endSearchViewAdapter = new ArrayAdapter<>(getContext(),
@@ -103,7 +128,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         super.onViewCreated(view, savedInstanceState);
         loadMapData();
 
-            SwitchUIToState(1);
+        SwitchUIToState(1);
     }
 
     private void loadMapData(){
@@ -147,7 +172,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             );
             layoutParams.leftMargin = horizontalMarginInPixels;
             layoutParams.rightMargin = horizontalMarginInPixels;
-            btn.setPadding(5, 0, 5, 0);
+            btn.setPadding(5, 2, 5, 2);
             btn.setLayoutParams(layoutParams);
             btn.setBackground(getResources().getDrawable(R.drawable.favs_recent_buttons_style));
             btn.setEllipsize(TextUtils.TruncateAt.END);
@@ -182,7 +207,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             );
             layoutParams.leftMargin = horizontalMarginInPixels;
             layoutParams.rightMargin = horizontalMarginInPixels;
-            btn.setPadding(5, 0, 5, 0);
+            btn.setPadding(5, 2, 5, 2);
             btn.setLayoutParams(layoutParams);
             btn.setBackground(getResources().getDrawable(R.drawable.favs_recent_buttons_style));
             btn.setEllipsize(TextUtils.TruncateAt.END);
@@ -213,8 +238,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void drawMapContent(MapDataResponse content){
         System.out.println("Map downloaded.");
-        CanvasView canvasView = binding.getRoot().findViewById(R.id.map_canvas_view);
-        canvasView.SetMapData(content);
+        canvasView.SetMapData(content, locationService.getLocation(), getColor(com.google.android.material.R.attr.colorSecondaryVariant));
     }
 
     private void SwitchUIToState(int state){
@@ -233,6 +257,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouritesLayout.setVisibility(View.VISIBLE);
         recentsLayout.setVisibility(View.VISIBLE);
         favouriteButton.setVisibility(View.GONE);
+        getDirectionsButton.setVisibility(View.GONE);
         ConfigureFavourites(preferences.getStringSet(Constants.FAVOURITES_SET_KEY,new HashSet<>()));
         ConfigureRecents(getRecents());
     }
@@ -242,6 +267,10 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouritesLayout.setVisibility(View.GONE);
         recentsLayout.setVisibility(View.GONE);
         favouriteButton.setVisibility(View.VISIBLE);
+        getDirectionsButton.setVisibility(View.VISIBLE);
+
+        startSearchView.setText(R.string.my_location);
+        startSearchView.setTextColor(getColor(androidx.appcompat.R.attr.colorPrimary));
 
         if (IsFavourite(mapViewModel.destination)){
             favouriteButton.setImageResource(R.drawable.ic_star_red_filled_24dp);
@@ -306,7 +335,28 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             SwitchUIToState(1);
         } else if (v.getId() == R.id.favourite_button) {
             ToggleFavourite();
+        } else if (v.getId() == R.id.get_directions_button) {
+            GetDirections();
         }
+    }
+
+    private void GetDirections(){
+        RouteRequestData requestData = new RouteRequestData();
+        requestData.startCoordinate = locationService.getLocation();
+        requestData.endContainerName = endSearchView.getText().toString();
+        boolean stepFree = preferences.getBoolean("stepFreeNav", false);
+        if(stepFree) requestData.accessibilityLevel = 1;
+        routingService.requestPath(requestData, new IHttpRequestCallback<Object>() {
+            @Override
+            public void onCompleted(HttpRequestService.HttpRequestResponse<Object> response) {
+                System.out.println("Successful call");
+            }
+
+            @Override
+            public void onException() {
+
+            }
+        });
     }
 
     private void ToggleFavourite() {
@@ -372,5 +422,11 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     @Override
     public void afterTextChanged(Editable s) {
 
+    }
+
+    private int getColor(int attrId){
+        TypedValue typedValue = new TypedValue();
+        getContext().getTheme().resolveAttribute(attrId, typedValue, true);
+        return  typedValue.data;
     }
 }

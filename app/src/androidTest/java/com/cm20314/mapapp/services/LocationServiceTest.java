@@ -1,10 +1,12 @@
 package com.cm20314.mapapp.services;
 
 import android.content.Context;
+import android.location.LocationListener;
 import android.os.Build;
 import android.os.Looper;
 import android.Manifest;
 
+import androidx.annotation.NonNull;
 import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 import androidx.test.rule.GrantPermissionRule;
@@ -37,7 +39,12 @@ public class LocationServiceTest {
     @Before
     public void createLocationService(){
         Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        locationService = new LocationService(context);
+        locationService = new LocationService(context, new LocationListener() {
+            @Override
+            public void onLocationChanged(@NonNull Location location) {
+
+            }
+        });
     }
 
 
