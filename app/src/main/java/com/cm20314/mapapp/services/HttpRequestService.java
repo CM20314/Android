@@ -28,7 +28,7 @@ public class HttpRequestService<TIn, TOut> {
     }
 
     public static class SendRequestTask<TIn, TOut> implements Runnable {
-        private final HttpMethod method;
+        private final String method;
         private final String uri;
         private final TIn obj;
         private final boolean hasContent;
@@ -36,7 +36,7 @@ public class HttpRequestService<TIn, TOut> {
         private final IHttpRequestCallback<TOut> callback;
         private final Class<TOut> outClass;
 
-        public SendRequestTask(HttpMethod method, String uri, TIn obj, boolean hasContent,
+        public SendRequestTask(String method, String uri, TIn obj, boolean hasContent,
                                Handler uiHandler, IHttpRequestCallback<TOut> callback, Class<TOut> outClass) {
             this.method = method;
             this.uri = uri;
@@ -54,7 +54,7 @@ public class HttpRequestService<TIn, TOut> {
             try {
                 URL url = new URL(uri);
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod(method.toString());
+                connection.setRequestMethod(method);
 
                 connection.setRequestProperty("x-api-key", BuildConfig.API_KEY);
 
@@ -69,6 +69,9 @@ public class HttpRequestService<TIn, TOut> {
 
                 int responseCode = connection.getResponseCode();
                 String responseBody = readResponse(connection);
+                if(hasContent){
+                    //responseBody = Constants.defResponse;
+                }
 
                 httpResponse.ResponseStatusCode = responseCode;
                 httpResponse.ResponseBody = responseBody;
@@ -120,7 +123,7 @@ public class HttpRequestService<TIn, TOut> {
         }
     }
 
-    public void sendHttpRequest(HttpMethod method, String uri, TIn obj, boolean hasContent,
+    public void sendHttpRequest(String method, String uri, TIn obj, boolean hasContent,
                                 IHttpRequestCallback<TOut> callback, Class<TOut> outClass) {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());

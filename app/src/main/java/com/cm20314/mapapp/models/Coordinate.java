@@ -5,6 +5,7 @@ public class Coordinate {
     public double y;
     public int z;
     public int id;
+    public String matchHandle = "";
 
     public Coordinate(){
 

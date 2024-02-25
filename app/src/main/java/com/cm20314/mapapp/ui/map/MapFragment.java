@@ -36,6 +36,7 @@ import com.cm20314.mapapp.models.Container;
 import com.cm20314.mapapp.models.MapDataResponse;
 import com.cm20314.mapapp.models.MapSearchResponse;
 import com.cm20314.mapapp.models.RouteRequestData;
+import com.cm20314.mapapp.models.RouteResponseData;
 import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.HttpRequestService;
 import com.cm20314.mapapp.services.LocationService;
@@ -346,10 +347,12 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         requestData.endContainerName = endSearchView.getText().toString();
         boolean stepFree = preferences.getBoolean("stepFreeNav", false);
         if(stepFree) requestData.accessibilityLevel = 1;
-        routingService.requestPath(requestData, new IHttpRequestCallback<Object>() {
+        routingService.requestPath(requestData, new IHttpRequestCallback<RouteResponseData>() {
             @Override
-            public void onCompleted(HttpRequestService.HttpRequestResponse<Object> response) {
-                System.out.println("Successful call");
+            public void onCompleted(HttpRequestService.HttpRequestResponse<RouteResponseData> response) {
+                if(response.Content.success){
+                    canvasView.UpdateRoute(response.Content, true);
+                }
             }
 
             @Override

@@ -22,9 +22,13 @@ import androidx.annotation.Nullable;
 import com.cm20314.mapapp.models.Building;
 import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.models.MapDataResponse;
+import com.cm20314.mapapp.models.NodeArcDirection;
+import com.cm20314.mapapp.models.RouteResponseData;
 
 public class CanvasView extends View {
     private MapDataResponse mapData;
+    private RouteResponseData routeData;
+    private boolean displayRoute = false;
     private Coordinate location;
     private Paint paint = new Paint(); // Paint object for coloring shapes
     private float radius = 100f; // Radius of circles to be drawn
@@ -77,18 +81,6 @@ public class CanvasView extends View {
         paint.setColor(Color.parseColor("#000000"));
         canvas.translate(canvasX, canvasY);
         drawBuildings(canvas);
-//        canvas.drawCircle(0f,0f,radius,paint);
-//        for (int i = 2; i<=40; i+=2) {
-//            canvas.drawCircle(radius*i,0f,radius,paint);
-//            canvas.drawCircle(-radius*i,0f,radius,paint);
-//            canvas.drawCircle(0f,radius*i,radius,paint);
-//            canvas.drawCircle(0f,-radius*i,radius,paint);
-//            canvas.drawCircle(radius*i,radius*i,radius,paint);
-//            canvas.drawCircle(radius*i,-radius*i,radius,paint);
-//            canvas.drawCircle(-radius*i,radius*i,radius,paint);
-//            canvas.drawCircle(-radius*i,-radius*i,radius,paint);
-//        }
-
         canvas.restore();
 
         dispWidth = getWidth();
@@ -191,6 +183,22 @@ public class CanvasView extends View {
         invalidate();
     }
 
+    public void UpdateRoute(RouteResponseData data, boolean invalidateMap){
+        routeData = data;
+        if(invalidateMap) {
+            SetDisplayRoute(true);
+            invalidate();
+        }
+    }
+
+    public void UpdateRoute(RouteResponseData data){
+        UpdateRoute(data, true);
+    }
+
+    public void SetDisplayRoute(boolean display){
+        displayRoute = display;
+    }
+
     public void UpdateLocation(Coordinate location, boolean invalidateMap){
         this.location = location;
         if(invalidateMap) invalidate();
@@ -259,5 +267,27 @@ public class CanvasView extends View {
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
         canvas.drawCircle((float) location.x, (float) location.y, 5, paint);
+
+        if(displayRoute){
+            // Display the route
+            Paint pathPaint = new Paint();
+            pathPaint.setColor(Color.BLACK);
+            pathPaint.setStyle(Paint.Style.STROKE);
+            pathPaint.setStrokeWidth(7 / scaleFactor);
+
+            Path vectorPath = new Path();
+            for(int i = 0; i < routeData.nodeArcDirections.size(); i++){
+                    NodeArcDirection nodeArcDirection = routeData.nodeArcDirections.get(i);
+                    Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
+                    Coordinate endCoordinate = nodeArcDirection.nodeArc.node2.coordinate;
+
+                    float startX = (float) (startCoordinate.x);
+                    float startY = (float) (startCoordinate.y);
+                    float endX = (float) (endCoordinate.x);
+                    float endY = (float) (endCoordinate.y);
+
+                    canvas.drawLine(startX, startY, endX, endY, paint);
+            }
+        }
     }
 }

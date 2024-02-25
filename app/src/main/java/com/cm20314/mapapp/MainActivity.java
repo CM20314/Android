@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 
 import com.cm20314.mapapp.models.Coordinate;
+import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.ElevationService;
 import com.cm20314.mapapp.services.LocationService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -30,6 +31,8 @@ import android.Manifest;
 import android.view.KeyEvent;
 import android.widget.Toast;
 
+import java.io.StringWriter;
+
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -38,6 +41,11 @@ public class MainActivity extends AppCompatActivity  {
 
     private ElevationService elevationService;
 
+    static String convertStreamToString(java.io.InputStream is) {
+        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
+        return s.hasNext() ? s.next() : "";
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +53,7 @@ public class MainActivity extends AppCompatActivity  {
         AppCenter.start(getApplication(), BuildConfig.APPCENTER_KEY,
                 Analytics.class, Crashes.class);
 
+        Constants.defResponse = convertStreamToString(getResources().openRawResource(R.raw.def_response));
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

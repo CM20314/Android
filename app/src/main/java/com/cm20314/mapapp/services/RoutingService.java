@@ -2,18 +2,19 @@ package com.cm20314.mapapp.services;
 
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.RouteRequestData;
+import com.cm20314.mapapp.models.RouteResponseData;
 
 public class RoutingService {
     public void requestPath(RouteRequestData requestData,
-                            IHttpRequestCallback<Object> callback){
-        HttpRequestService<RouteRequestData, Object> httpRequestService = new HttpRequestService<>();
+                            IHttpRequestCallback<RouteResponseData> callback){
+        HttpRequestService<RouteRequestData, RouteResponseData> httpRequestService = new HttpRequestService<>();
         httpRequestService.sendHttpRequest(
-                HttpMethod.GET,
+                HttpMethod.POST,
                 Constants.API_ROOT + "/directions",
                 requestData,
                 true,
                 callback,
-                Object.class
+                RouteResponseData.class
                 /*new IHttpRequestCallback<MapDataResponse>() {
                     @Override
                     public void onCompleted(HttpRequestService.HttpRequestResponse<MapDataResponse> response) {
