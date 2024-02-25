@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity  {
         AppCenter.start(getApplication(), BuildConfig.APPCENTER_KEY,
                 Analytics.class, Crashes.class);
 
-        Constants.defResponse = convertStreamToString(getResources().openRawResource(R.raw.def_response));
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

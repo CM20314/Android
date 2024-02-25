@@ -15,6 +15,4 @@ public class Constants {
 
 
     public static final float[] gpsOffset = {51.383272F, (float) -2.336011};
-
-    public static String defResponse = "";
 }
