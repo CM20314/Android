@@ -53,6 +53,8 @@ public class MainActivity extends AppCompatActivity  {
         AppCenter.start(getApplication(), BuildConfig.APPCENTER_KEY,
                 Analytics.class, Crashes.class);
 
+        Constants.Initialise();
+
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 

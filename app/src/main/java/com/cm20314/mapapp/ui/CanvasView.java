@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
@@ -19,11 +20,13 @@ import android.graphics.Color;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.models.Building;
 import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.models.MapDataResponse;
 import com.cm20314.mapapp.models.NodeArcDirection;
 import com.cm20314.mapapp.models.RouteResponseData;
+import com.cm20314.mapapp.services.Constants;
 
 public class CanvasView extends View {
     private MapDataResponse mapData;
@@ -253,20 +256,24 @@ public class CanvasView extends View {
 // Then overlap this with the border path.
             canvas.drawPath(vectorPath, borderPaint);
 
-                paint.setTextSize(7);
+            Coordinate offset = Constants.TEXT_OFFSETS.getOrDefault(building.shortName, new Coordinate(0,0));
+
+            paint.setTextSize(7);
                 paint.setColor(Color.BLACK);
                 paint.setTextAlign(Paint.Align.CENTER);
 
-                float midX = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble();
-                float midY = (float) building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble();
+                float midX = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble() + offset.x);
+                float midY = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble() + offset.y);
                 canvas.drawText(building.shortName, midX, midY, paint);
             }
         // Draw location
 
-        paint.setColor(Color.BLUE);
+        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
-        canvas.drawCircle((float) location.x, (float) location.y, 5, paint);
+        canvas.drawCircle((float) location.x, (float) location.y, 10 / scaleFactor, paint);
+        paint.setAlpha(30);
+        canvas.drawCircle((float) location.x, (float) location.y, 80 / scaleFactor, paint);
 
         if(displayRoute){
             // Display the route
@@ -289,5 +296,10 @@ public class CanvasView extends View {
                     canvas.drawLine(startX, startY, endX, endY, paint);
             }
         }
+    }
+    private int getColor(int attrId){
+        TypedValue typedValue = new TypedValue();
+        getContext().getTheme().resolveAttribute(attrId, typedValue, true);
+        return  typedValue.data;
     }
 }
