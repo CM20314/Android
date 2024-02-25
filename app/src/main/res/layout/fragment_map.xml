@@ -6,18 +6,146 @@
     android:layout_height="match_parent"
     tools:context=".ui.map.MapFragment">
 
-    <TextView
-        android:id="@+id/text_home"
+    <com.cm20314.mapapp.ui.CanvasView
+        android:id="@+id/map_canvas_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:text="MAP FRAGMENT"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:orientation="vertical">
+        <RelativeLayout
+            android:id="@+id/start_search_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/search_bar_style"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:id="@+id/start_placeholder_icon"
+                android:layout_width="32dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="0dp"
+                android:src="@drawable/arrow_back_24dp"/>
+
+            <AutoCompleteTextView
+                android:id="@+id/start_search_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                android:layout_toEndOf="@id/start_placeholder_icon"
+                android:background="@android:color/transparent"
+                android:completionThreshold="1"
+                android:dropDownWidth="300dp"
+                android:hint="@string/start_search_placeholder"
+                android:popupBackground="#eff6ff" />
+        </RelativeLayout>
+        <RelativeLayout
+            android:id="@+id/end_search_layout"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/search_bar_style"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <ImageView
+                android:id="@+id/search_icon"
+                android:layout_width="32dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="0dp"
+                android:src="@drawable/ic_search_black_24dp"
+                android:contentDescription="@string/search_icon_desc"/>
+
+
+            <AutoCompleteTextView
+                android:id="@+id/end_search_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                android:layout_toEndOf="@id/search_icon"
+                android:background="@android:color/transparent"
+                android:completionThreshold="1"
+                android:dropDownWidth="300dp"
+                android:hint="@string/end_search_placeholder"
+                android:popupBackground="#eff6ff" />
+
+            <ImageView
+                android:id="@+id/favourite_button"
+                android:layout_width="32dp"
+                android:layout_height="25dp"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="5dp"
+                android:layout_alignEnd="@id/end_search_view"
+                android:src="@drawable/ic_star_red_24dp"
+                android:padding="2dp"
+                android:contentDescription="@string/search_icon_desc"/>
+
+        </RelativeLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/favourites_container"
+            android:orientation="horizontal"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_gravity="center_vertical">
+            <ImageView
+                android:id="@+id/favourites_icon"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/favs_recents_icon_style"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_star_black"
+                android:padding="2dp"
+                android:contentDescription="@string/search_icon_desc"/>
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/recents_container"
+            android:orientation="horizontal"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_gravity="center_vertical">
+            <ImageView
+                android:id="@+id/recents_icon"
+                android:layout_width="36dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/favs_recents_icon_style"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/ic_history_black_24dp"
+                android:contentDescription="@string/search_icon_desc"/>
+
+        </LinearLayout>
+        <Button
+            android:id="@+id/get_directions_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/get_directions_button_style"
+            android:layout_margin="8dp"
+            android:text="@string/get_directions"
+            android:textSize="16sp"/>
+
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
