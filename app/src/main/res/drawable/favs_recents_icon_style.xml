@@ -3,11 +3,8 @@
 <!-- Background shape -->
 <item>
     <shape android:shape="rectangle">
-    <solid android:color="@color/gray_400" /> <!-- Background color -->
+    <solid android:color="@android:color/transparent" /> <!-- Background color -->
     <corners android:radius="24dp" /> <!-- Border radius -->
-    <stroke
-        android:width="1dp"
-        android:color="@color/gray_400" /> <!-- Border color -->
     </shape>
 </item>
 </layer-list>
