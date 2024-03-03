@@ -22,6 +22,8 @@ public class Constants {
 
     public static final float[] gpsOffset = {51.383272F, (float) -2.336011};
 
+    public static final double MAX_DISTANCE_TO_PATH_BEFORE_RECOMPUTING = 15;
+
     public static Map<String, Coordinate> TEXT_OFFSETS = new HashMap<String, Coordinate>();
 
     public static void Initialise(){

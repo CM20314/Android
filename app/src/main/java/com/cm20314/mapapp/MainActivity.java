@@ -10,6 +10,7 @@ import android.os.Bundle;
 import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.ElevationService;
+import com.cm20314.mapapp.services.HttpRequestService;
 import com.cm20314.mapapp.services.LocationService;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -74,6 +75,8 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         elevationService = new ElevationService();
+
+        HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
     }
 
     /**

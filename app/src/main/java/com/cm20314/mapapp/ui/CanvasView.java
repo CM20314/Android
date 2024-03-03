@@ -10,6 +10,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -30,7 +32,7 @@ import com.cm20314.mapapp.services.Constants;
 
 public class CanvasView extends View {
     private MapDataResponse mapData;
-    private RouteResponseData routeData;
+    public RouteResponseData routeData;
     private boolean displayRoute = false;
     private Coordinate location;
     private Paint paint = new Paint(); // Paint object for coloring shapes
@@ -217,6 +219,25 @@ public class CanvasView extends View {
 
         if( mapData == null) return;
 
+        Paint pathsPaint = new Paint();
+        pathsPaint.setColor(Color.GRAY);
+        pathsPaint.setStyle(Paint.Style.STROKE);
+        pathsPaint.setAlpha(30);
+        pathsPaint.setAntiAlias(true);
+        pathsPaint.setStrokeWidth(20 / scaleFactor);
+
+        for(int i = 0; i < mapData.paths.size(); i++){
+            Coordinate startCoordinate = mapData.paths.get(i).node1.coordinate;
+            Coordinate endCoordinate = mapData.paths.get(i).node2.coordinate;
+
+            float startX = (float) (startCoordinate.x);
+            float startY = (float) (startCoordinate.y);
+            float endX = (float) (endCoordinate.x);
+            float endY = (float) (endCoordinate.y);
+
+            canvas.drawLine(startX, startY, endX, endY, pathsPaint);
+        }
+
         for(Building building : mapData.buildings){
             paint.setColor(Color.GRAY); // Set the line color to black
             Path vectorPath = new Path();
@@ -278,11 +299,10 @@ public class CanvasView extends View {
         if(displayRoute){
             // Display the route
             Paint pathPaint = new Paint();
-            pathPaint.setColor(Color.BLACK);
+            pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
             pathPaint.setStyle(Paint.Style.STROKE);
-            pathPaint.setStrokeWidth(7 / scaleFactor);
+            pathPaint.setStrokeWidth(8 / scaleFactor);
 
-            Path vectorPath = new Path();
             for(int i = 0; i < routeData.nodeArcDirections.size(); i++){
                     NodeArcDirection nodeArcDirection = routeData.nodeArcDirections.get(i);
                     Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
@@ -293,8 +313,14 @@ public class CanvasView extends View {
                     float endX = (float) (endCoordinate.x);
                     float endY = (float) (endCoordinate.y);
 
-                    canvas.drawLine(startX, startY, endX, endY, paint);
+                    canvas.drawLine(startX, startY, endX, endY, pathPaint);
             }
+
+            pathPaint.setStyle(Paint.Style.FILL);
+            pathPaint.setAntiAlias(true);
+            Coordinate destCoord = routeData.nodeArcDirections.get(routeData.nodeArcDirections.size() - 1).nodeArc.node2.coordinate;
+            canvas.drawCircle((float) destCoord.x, (float) destCoord.y, 10 / scaleFactor, pathPaint);
+
         }
     }
     private int getColor(int attrId){

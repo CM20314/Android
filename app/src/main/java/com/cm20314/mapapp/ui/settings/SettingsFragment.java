@@ -32,7 +32,6 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onCreatePreferences(@Nullable Bundle savedInstanceState, @Nullable String rootKey) {
         setPreferencesFromResource(R.xml.preferences, rootKey);
 
-        android.content.Context c = getContext();
         PreferenceManager.getDefaultSharedPreferences(getContext())
                 .registerOnSharedPreferenceChangeListener(this);
     }
