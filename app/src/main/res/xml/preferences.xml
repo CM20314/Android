@@ -1,0 +1,35 @@
+<PreferenceScreen
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory
+        app:key   = "colourModeCat"
+        app:title = "Display">
+
+        <ListPreference
+            app:key          = "coloursPref"
+            app:title        = "Select colour mode"
+            app:defaultValue = "1"
+            app:entries      = "@array/colourModeArray"
+            app:entryValues  = "@array/arrayValues"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        app:key   = "accessibilityCat"
+        app:title = "Accessibility">
+
+        <SwitchPreferenceCompat
+            app:key   = "stepFreeNav"
+            app:title = "Enable step free navigation"/>
+
+        <SwitchPreferenceCompat
+            app:key   = "quietRoutesNav"
+            app:title = "Prioritise quiet routes"/>
+
+        <SwitchPreferenceCompat
+            app:key = "textToSpeech"
+            app:title = "Enable text to speech navigation"/>
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

@@ -7,13 +7,13 @@
 
     <fragment
         android:id="@+id/navigation_map"
-        android:name="com.example.cm20314.ui.map.MapFragment"
+        android:name="com.cm20314.mapapp.ui.map.MapFragment"
         android:label="@string/title_map"
-        tools:layout="@layout/fragment_map" />
+        tools:layout="@layout/fragment_settings" />
 
     <fragment
         android:id="@+id/navigation_settings"
-        android:name="com.example.cm20314.ui.settings.SettingsFragment"
+        android:name="com.cm20314.mapapp.ui.settings.SettingsFragment"
         android:label="@string/title_settings"
         tools:layout="@layout/fragment_settings" />
 </navigation>
