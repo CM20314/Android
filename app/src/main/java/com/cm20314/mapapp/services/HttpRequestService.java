@@ -1,10 +1,13 @@
 package com.cm20314.mapapp.services;
 
+import static com.microsoft.appcenter.utils.HandlerUtils.runOnUiThread;
+
 import android.os.Handler;
 import android.os.Looper;
 
 import com.cm20314.mapapp.BuildConfig;
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
+import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -19,6 +22,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HttpRequestService<TIn, TOut> {
+
+    public static CircularProgressIndicator progressIndicator;
 
     public static class HttpRequestResponse<T> {
         public T Content;
@@ -50,6 +55,14 @@ public class HttpRequestService<TIn, TOut> {
         @Override
         public void run() {
             HttpRequestResponse<TOut> httpResponse = new HttpRequestResponse<>();
+            if (progressIndicator != null) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        progressIndicator.show();
+                    }
+                });
+            }
 
             try {
                 URL url = new URL(uri);
@@ -85,6 +98,15 @@ public class HttpRequestService<TIn, TOut> {
                 httpResponse.ConnectionSucceeded = false;
                 handleException();
             }
+
+                if (progressIndicator != null) {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            progressIndicator.hide();
+                        }
+                    });
+                }
 
             handleResponse(httpResponse);
         }

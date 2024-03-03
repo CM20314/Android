@@ -2,15 +2,28 @@
     <!-- Base application theme. -->
     <style name="Theme.MapApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
+        <!-- background of favs/recent, colour of location, selected tab and semicircle -->
         <item name="colorPrimary">@color/dark_blue</item>
-        <item name="colorPrimaryVariant">@color/vibrant_blue_light</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <!-- favs/recent icon colour -->
+        <item name="colorPrimaryDark">@color/very_dark_blue</item>
+        <!-- nav bar, outline of favs/recent items, settings titles -->
+        <item name="colorAccent">@color/white</item>
+        <!-- nothing? -->
+        <item name="colorOnPrimary">@color/white</item>
+
+
         <!-- Secondary brand color. -->
+        <!-- nothing? -->
         <item name="colorSecondary">@color/light_blue</item>
-        <item name="colorSecondaryVariant">@color/vibrant_blue_extra_light</item>
+        <!-- colour of buildings -->
+        <item name="colorSecondaryVariant">@color/very_light_blue</item>
+        <!-- nothing? -->
         <item name="colorOnSecondary">@color/black</item>
+
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/very_dark_blue</item>
+        <item name="android:colorControlNormal">?android:colorPrimary</item>
+        <item name="android:colorControlActivated">?android:colorSecondary</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>

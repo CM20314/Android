@@ -6,4 +6,5 @@ public class MapDataResponse
 {
     public List<Building> buildings;
     public List<Room> rooms;
+    public List<NodeArc> paths;
 }
