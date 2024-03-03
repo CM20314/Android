@@ -198,6 +198,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             btn.setPadding(10, 2, 10, 2);
             btn.setLayoutParams(layoutParams);
             btn.setBackground(getResources().getDrawable(R.drawable.favs_recent_buttons_style));
+            btn.setTextColor(getColor(androidx.appcompat.R.attr.colorAccent));
             btn.setEllipsize(TextUtils.TruncateAt.END);
             btn.setMaxLines(1);
             btn.setText(c);
@@ -206,7 +207,6 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
                 mapViewModel.destination = c;
                 setAutoCompleteText(c);
             });
-            btn.setTextColor(getResources().getColor(com.google.android.material.R.color.design_default_color_on_primary));
             favouritesLayout.addView(btn);
         }
     }
@@ -233,6 +233,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             btn.setPadding(10, 2, 10, 2);
             btn.setLayoutParams(layoutParams);
             btn.setBackground(getResources().getDrawable(R.drawable.favs_recent_buttons_style));
+            btn.setTextColor(getColor(androidx.appcompat.R.attr.colorAccent));
             btn.setEllipsize(TextUtils.TruncateAt.END);
             btn.setMaxLines(1);
             btn.setText(recentSearch);
@@ -241,7 +242,6 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
                 setAutoCompleteText(recentSearch);
             });
             btn.setBackgroundResource(R.drawable.favs_recent_buttons_style);
-            btn.setTextColor(getResources().getColor(com.google.android.material.R.color.design_default_color_on_primary));
             recentsLayout.addView(btn);
         }
     }

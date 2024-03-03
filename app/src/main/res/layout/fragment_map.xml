@@ -50,7 +50,7 @@
                 android:completionThreshold="1"
                 android:dropDownWidth="300dp"
                 android:hint="@string/start_search_placeholder"
-                android:popupBackground="#eff6ff" />
+                android:popupBackground="?attr/colorSecondary" />
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/end_search_layout"
