@@ -299,7 +299,7 @@ public class CanvasView extends View {
         if(displayRoute){
             // Display the route
             Paint pathPaint = new Paint();
-            pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
+            pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
             pathPaint.setStyle(Paint.Style.STROKE);
             pathPaint.setStrokeWidth(8 / scaleFactor);
 
