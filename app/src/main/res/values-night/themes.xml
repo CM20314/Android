@@ -16,9 +16,9 @@
         <!-- nothing? -->
         <item name="colorSecondary">@color/light_blue</item>
         <!-- colour of buildings -->
-        <item name="colorSecondaryVariant">@color/very_light_blue</item>
+        <item name="colorSecondaryVariant">@color/dark_blue</item>
         <!-- nothing? -->
-        <item name="colorOnSecondary">@color/black</item>
+        <item name="colorOnSecondary">@color/white</item>
 
         <!-- Status bar color. -->
         <item name="android:statusBarColor">@color/very_dark_blue</item>

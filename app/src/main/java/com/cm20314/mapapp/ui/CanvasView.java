@@ -280,7 +280,7 @@ public class CanvasView extends View {
             Coordinate offset = Constants.TEXT_OFFSETS.getOrDefault(building.shortName, new Coordinate(0,0));
 
             paint.setTextSize(7);
-                paint.setColor(Color.BLACK);
+                paint.setColor(getColor(androidx.appcompat.R.attr.colorAccent));
                 paint.setTextAlign(Paint.Align.CENTER);
 
                 float midX = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble() + offset.x);
