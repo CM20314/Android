@@ -54,9 +54,23 @@ public class LocationService {
         }
 
         return new float[] {output[0], output[1]};
-
     }
 
+    public static Coordinate transformCoords(Coordinate coord){
+        coord.x =  ((1000/360.0) * (180 + coord.y));
+        coord.y =  ((1000/180.0) * (90 - coord.x));
+
+        // Rotate anticlockwise by 10 degrees
+        coord.rotate(10);
+        // 875.2768628791658, -2121.950405027816
+        // 875.3877893845381, -2122.2518299289545
+        // Scale the coordinate
+        coord.scale(875.2768628791658, -2121.950405027816,  875.3877893845381, -2122.2518299289545);
+
+        coord.y = 1000 - coord.y;
+
+        return coord;
+    }
 
     /**
      * Gets the location of the device as coordinates on the map.
@@ -66,8 +80,9 @@ public class LocationService {
      */
     public Coordinate getLocation(){
         float[] latAndLong = getLatAndLong();
-        float[] coordinateValues = transformCoordinates(latAndLong);
-        return new Coordinate(coordinateValues[0], coordinateValues[1]);
+        return transformCoords(new Coordinate(latAndLong[0], latAndLong[1]));
+//        float[] coordinateValues = transformCoordinates(latAndLong);
+//        return new Coordinate(coordinateValues[0], coordinateValues[1]);
     }
 
 
