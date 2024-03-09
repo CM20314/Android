@@ -9,7 +9,7 @@ public class ElevationService {
     }
 
     public void setElevation(int newElevation){
-        if (newElevation > 0 && newElevation < 50) {
+        if (newElevation > -10 && newElevation < 10) {
             elevation = newElevation;
         }
     }

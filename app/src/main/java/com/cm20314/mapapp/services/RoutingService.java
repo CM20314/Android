@@ -40,6 +40,15 @@ public class RoutingService {
     }
 
     public boolean updateDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location, TextView directionTextView){
+        String directionCommand = getDirectionCommand(nodeArcDirections, location);
+        if(directionCommand.equals("false")){
+            return false;
+        }
+        directionTextView.setText(directionCommand);
+        return true;
+    }
+
+    public String getDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location){
         NodeArcDirection nearestNodeArcDirection = null;
         double shortestDistance = Integer.MAX_VALUE;
 
@@ -52,7 +61,7 @@ public class RoutingService {
         }
 
         if(shortestDistance > Constants.MAX_DISTANCE_TO_PATH_BEFORE_RECOMPUTING){
-            return false;
+            return "false";
         }
 
         if(nearestNodeArcDirection != null){
@@ -60,8 +69,10 @@ public class RoutingService {
             if(directionCommand.equals("")){
                 directionCommand = "Walk";
             }
-            directionTextView.setText(directionCommand);
+
+            return directionCommand;
         }
-        return true;
+
+        return "false";
     }
 }

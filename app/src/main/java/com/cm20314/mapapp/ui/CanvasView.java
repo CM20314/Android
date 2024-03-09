@@ -36,15 +36,11 @@ public class CanvasView extends View {
     private boolean displayRoute = false;
     private Coordinate location;
     private Paint paint = new Paint(); // Paint object for coloring shapes
-    private float radius = 100f; // Radius of circles to be drawn
-
     private float initX = 0f ;// See onTouchEvent
     private float initY = 0f ;// See onTouchEvent
 
     private float canvasX = 0f; // x-coord of canvas center
     private float canvasY = 0f; // y-coord of canvas center
-    private float dispWidth = 0f; // (Supposed to be) width of entire canvas
-    private float dispHeight = 0f ;// (Supposed to be) height of entire canvas
 
     private boolean dragging = false; // May be unnecessary
     private boolean firstDraw = true;
@@ -87,9 +83,6 @@ public class CanvasView extends View {
         canvas.translate(canvasX, canvasY);
         drawBuildings(canvas);
         canvas.restore();
-
-        dispWidth = getWidth();
-        dispHeight = getHeight();
     }
 
     @Override

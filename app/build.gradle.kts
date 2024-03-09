@@ -45,6 +45,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("com.microsoft.appcenter:appcenter-analytics:5.0.4")
     implementation("com.microsoft.appcenter:appcenter-crashes:5.0.4")
+    implementation("androidx.test.uiautomator:uiautomator:2.3.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test:runner:1.4.0")
     androidTestImplementation("androidx.test:rules:1.4.0")

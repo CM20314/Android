@@ -26,7 +26,6 @@ import static org.junit.Assert.*;
 import com.cm20314.mapapp.MainActivity;
 import com.cm20314.mapapp.services.LocationService;
 
-
 @RunWith(AndroidJUnit4.class)
 public class LocationServiceTest {
 

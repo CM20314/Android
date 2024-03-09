@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity  {
     private ActivityMainBinding binding;
     private Context context;
 
-    private ElevationService elevationService;
+    public static ElevationService elevationService = new ElevationService();
 
     static String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
@@ -73,8 +73,6 @@ public class MainActivity extends AppCompatActivity  {
         if (!permissionsGranted()){
             getLocationPermissions();
         }
-
-        elevationService = new ElevationService();
 
         HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
     }
@@ -110,11 +108,13 @@ public class MainActivity extends AppCompatActivity  {
             case KeyEvent.KEYCODE_VOLUME_UP:
                 if (action == KeyEvent.ACTION_DOWN) {
                     elevationService.increaseElevation();
+                    Toast.makeText(getApplicationContext(), String.format("Floor %s", elevationService.getElevation()), Toast.LENGTH_SHORT).show();
                 }
                 break;
             case KeyEvent.KEYCODE_VOLUME_DOWN:
                 if (action == KeyEvent.ACTION_DOWN) {
                     elevationService.decreaseElevation();
+                    Toast.makeText(getApplicationContext(), String.format("Floor %s", elevationService.getElevation()), Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
