@@ -13,7 +13,7 @@ public class MapDataService {
         HttpRequestService<Object, MapDataResponse> httpRequestService = new HttpRequestService<>();
         httpRequestService.sendHttpRequest(
                 HttpMethod.GET,
-                Constants.API_ROOT + "/map?buildingId=" + buildingId + "&roomId=" + roomId,
+                constructMapRequestUrl(buildingId, roomId),
                 null,
                 false,
                 callback,
@@ -25,11 +25,20 @@ public class MapDataService {
         HttpRequestService<Object, MapSearchResponse> httpRequestService = new HttpRequestService<>();
         httpRequestService.sendHttpRequest(
                 HttpMethod.GET,
-                Constants.API_ROOT + "/search?query="+query,
+                constructContainerSearchUrl(query),
                 null,
                 false,
                 callback,
                 MapSearchResponse.class
         );
+    }
+
+    public String constructMapRequestUrl(int buildingId, int roomId){
+        return Constants.API_ROOT + "/map?buildingId=" + buildingId + "&roomId=" + roomId;
+    }
+    public String constructContainerSearchUrl(String query){
+        if(query == null) query = "null";
+        else if(query.equals("")) query="null";
+        return Constants.API_ROOT + "/search?query="+query;
     }
 }

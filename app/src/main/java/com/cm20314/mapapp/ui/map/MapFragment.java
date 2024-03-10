@@ -23,6 +23,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -83,6 +84,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     private TextView directionsEndTextView;
     private TextView directionsCommandTextView;
 
+    private ImageView favouritesIcon;
+    private ImageView recentsIcon;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
@@ -140,6 +144,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         directionsCommandTextView = root.findViewById(R.id.directions_command_text_view);
         directionsEndTextView = root.findViewById(R.id.directions_end_text_view);
 
+        favouritesIcon = root.findViewById(R.id.favourites_icon);
+        recentsIcon = root.findViewById(R.id.recents_icon);
+
         return root;
     }
 
@@ -162,16 +169,17 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
                     System.out.println("Successful call.");
                     drawMapContent(response.Content);
                 }
-                else{
+                else if(response.ResponseStatusCode != 0){
                     System.out.println("Unsuccessful call.");
-                    // unsuccessful API call
+                    Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onException() {
                 // erroneous API call
-                System.out.println("Failed call.");
+                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
+
             }
         });
     }
@@ -182,6 +190,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             for (int i = 1; i < childrenCount; i++){
                 favouritesLayout.removeViewAt(1);
             }
+        }
+        if(containerNames.size() > 0){
+            favouritesIcon.setVisibility(View.VISIBLE);
         }
         for(String c : containerNames){
             Button btn = new Button(getContext());
@@ -217,6 +228,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             for (int i = 1; i < childrenCount; i++){
                 recentsLayout.removeViewAt(1);
             }
+        }
+        if(recentSearches.size() > 0){
+            recentsIcon.setVisibility(View.VISIBLE);
         }
         for(String recentSearch : recentSearches){
             Button btn = new Button(getContext());
@@ -394,17 +408,24 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         routingService.requestPath(requestData, new IHttpRequestCallback<RouteResponseData>() {
             @Override
             public void onCompleted(HttpRequestService.HttpRequestResponse<RouteResponseData> response) {
-                if(response.Content.success){
-                    canvasView.UpdateRoute(response.Content, true);
-                    directionsEndTextView.setText("DST_PH");
-                    UpdateDirections();
-                    SwitchUIToState(3);
+                if(response.ResponseStatusCode == 200){
+                    if(response.Content.success){
+                        canvasView.UpdateRoute(response.Content, true);
+                        directionsEndTextView.setText(response.Content.destination);
+                        UpdateDirections();
+                        SwitchUIToState(3);
+                    }
+                    else{
+                        Toast.makeText(getContext(), response.Content.errorMessage, Toast.LENGTH_SHORT).show();
+                    }
+                }else{
+                    Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onException() {
-
+                Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -455,15 +476,20 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
                 endSearchView.getText().toString(), new IHttpRequestCallback<MapSearchResponse>() {
                     @Override
                     public void onCompleted(HttpRequestService.HttpRequestResponse<MapSearchResponse> response) {
-                        suggestionsList = response.Content.results.stream().map(c -> c.longName).collect(Collectors.toList());
-                        endSearchViewAdapter.clear();
-                        endSearchViewAdapter.addAll(suggestionsList);
-                        endSearchViewAdapter.notifyDataSetChanged();
+                        if(response.ResponseStatusCode == 200){
+                            suggestionsList = response.Content.results.stream().map(c -> c.longName).collect(Collectors.toList());
+                            endSearchViewAdapter.clear();
+                            endSearchViewAdapter.addAll(suggestionsList);
+                            endSearchViewAdapter.notifyDataSetChanged();
+                        }
+                        else if(response.ResponseStatusCode != 0){
+                            Toast.makeText(getContext(), "Server error", Toast.LENGTH_SHORT).show();
+                        }
                     }
 
                     @Override
                     public void onException() {
-
+                        Toast.makeText(getContext(), "Network error", Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -484,7 +510,11 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void UpdateDirections(){
         if(canvasView.routeData != null){
-            routingService.updateDirectionCommand(canvasView.routeData.nodeArcDirections, locationService.getLocation(), directionsCommandTextView);
+            boolean res = routingService.updateDirectionCommand(canvasView.routeData.nodeArcDirections, locationService.getLocation(), directionsCommandTextView);
+            if(!res){
+                // re-request directions
+                GetDirections();
+            }
         }
     }
 

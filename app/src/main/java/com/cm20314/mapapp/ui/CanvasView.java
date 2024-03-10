@@ -36,15 +36,11 @@ public class CanvasView extends View {
     private boolean displayRoute = false;
     private Coordinate location;
     private Paint paint = new Paint(); // Paint object for coloring shapes
-    private float radius = 100f; // Radius of circles to be drawn
-
     private float initX = 0f ;// See onTouchEvent
     private float initY = 0f ;// See onTouchEvent
 
     private float canvasX = 0f; // x-coord of canvas center
     private float canvasY = 0f; // y-coord of canvas center
-    private float dispWidth = 0f; // (Supposed to be) width of entire canvas
-    private float dispHeight = 0f ;// (Supposed to be) height of entire canvas
 
     private boolean dragging = false; // May be unnecessary
     private boolean firstDraw = true;
@@ -87,9 +83,6 @@ public class CanvasView extends View {
         canvas.translate(canvasX, canvasY);
         drawBuildings(canvas);
         canvas.restore();
-
-        dispWidth = getWidth();
-        dispHeight = getHeight();
     }
 
     @Override
@@ -280,7 +273,7 @@ public class CanvasView extends View {
             Coordinate offset = Constants.TEXT_OFFSETS.getOrDefault(building.shortName, new Coordinate(0,0));
 
             paint.setTextSize(7);
-                paint.setColor(Color.BLACK);
+                paint.setColor(getColor(androidx.appcompat.R.attr.colorAccent));
                 paint.setTextAlign(Paint.Align.CENTER);
 
                 float midX = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble() + offset.x);
@@ -289,7 +282,7 @@ public class CanvasView extends View {
             }
         // Draw location
 
-        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
+        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
         canvas.drawCircle((float) location.x, (float) location.y, 10 / scaleFactor, paint);

@@ -15,4 +15,9 @@ public class Coordinate {
         this.x = x;
         this.y = y;
     }
+
+    public void stretch(double factorX, double factorY){
+        x = (x - 500) * factorX + 500;
+        y = (y - 416) * factorY + 416;
+    }
 }

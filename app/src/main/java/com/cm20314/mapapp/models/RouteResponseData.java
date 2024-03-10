@@ -6,4 +6,5 @@ public class RouteResponseData {
     public List<NodeArcDirection> nodeArcDirections;
     public boolean success;
     public String errorMessage;
+    public String destination;
 }
