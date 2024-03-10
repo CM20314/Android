@@ -1,16 +1,29 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.CM20314" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="Theme.MapApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color. -->
-        <item name="colorPrimary">@color/purple_200</item>
-        <item name="colorPrimaryVariant">@color/purple_700</item>
-        <item name="colorOnPrimary">@color/black</item>
+        <!-- background of favs/recent, colour of location, selected tab and semicircle -->
+        <item name="colorPrimary">@color/dark_blue</item>
+        <!-- favs/recent icon colour -->
+        <item name="colorPrimaryDark">@color/very_dark_blue</item>
+        <!-- nav bar, outline of favs/recent items, settings titles -->
+        <item name="colorAccent">@color/white</item>
+        <!-- nothing? -->
+        <item name="colorOnPrimary">@color/white</item>
+
+
         <!-- Secondary brand color. -->
-        <item name="colorSecondary">@color/teal_200</item>
-        <item name="colorSecondaryVariant">@color/teal_200</item>
-        <item name="colorOnSecondary">@color/black</item>
+        <!-- nothing? -->
+        <item name="colorSecondary">@color/light_blue</item>
+        <!-- colour of buildings -->
+        <item name="colorSecondaryVariant">@color/dark_blue</item>
+        <!-- nothing? -->
+        <item name="colorOnSecondary">@color/white</item>
+
         <!-- Status bar color. -->
-        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/very_dark_blue</item>
+        <item name="android:colorControlNormal">?android:colorPrimary</item>
+        <item name="android:colorControlActivated">?android:colorSecondary</item>
         <!-- Customize your theme here. -->
     </style>
 </resources>
