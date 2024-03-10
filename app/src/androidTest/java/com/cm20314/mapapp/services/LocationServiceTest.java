@@ -68,7 +68,7 @@ public class LocationServiceTest {
         locationManager.setTestProviderLocation(LocationManager.GPS_PROVIDER, mockLocation);
         //idk what this line does but otherwise the location service doesn't work
         Looper.prepare();
-        float[] coords = locationService.getLatAndLong();
+        double[] coords = locationService.getLatAndLong();
         assertTrue(coords[0] != 0 || coords[1] != 0);
     }
 }

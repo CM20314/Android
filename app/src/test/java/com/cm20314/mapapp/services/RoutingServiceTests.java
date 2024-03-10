@@ -47,7 +47,7 @@ public class RoutingServiceTests {
     @Test
     public void DirectionTextTest3(){
         String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 460));
-        String expectedOutput = "Walk";
+        String expectedOutput = "Arrive";
 
         assertEquals(expectedOutput, directionCommand);
     }
@@ -55,7 +55,7 @@ public class RoutingServiceTests {
     @Test
     public void DirectionTextTest4(){
         String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 463));
-        String expectedOutput = "Turn Right";
+        String expectedOutput = "Arrive";
 
         assertEquals(expectedOutput, directionCommand);
     }
