@@ -108,7 +108,7 @@ public class Constants {
         COLOURS.put("Norwood House", 1);
         COLOURS.put("WH", 1);
         COLOURS.put("FH", 2);
-        COLOURS.put("3G", 4);
+        COLOURS.put("3G", 3);
         COLOURS.put("4W Cafe", 2);
         COLOURS.put("Astro", 4);
         COLOURS.put("Track", 3);
@@ -133,6 +133,5 @@ public class Constants {
         CAT_TO_COLOUR.put(1, R.color.yellow);
         CAT_TO_COLOUR.put(2, R.color.purple);
         CAT_TO_COLOUR.put(3, R.color.green);
-        CAT_TO_COLOUR.put(4, R.color.dark_green);
     }
 }
