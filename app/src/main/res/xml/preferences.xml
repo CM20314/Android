@@ -22,14 +22,14 @@
             app:key   = "stepFreeNav"
             app:title = "Enable step free navigation"/>
 
-        <SwitchPreferenceCompat
+        <!--<SwitchPreferenceCompat
             app:key   = "quietRoutesNav"
             app:title = "Prioritise quiet routes"/>
 
         <SwitchPreferenceCompat
             app:key = "textToSpeech"
             app:title = "Enable text to speech navigation"/>
-
+-->
     </PreferenceCategory>
 
 </PreferenceScreen>

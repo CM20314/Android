@@ -30,22 +30,18 @@ import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 import android.Manifest;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.StringWriter;
 
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
 
     private ActivityMainBinding binding;
-    private Context context;
 
     public static ElevationService elevationService = new ElevationService();
-
-    static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +71,13 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
+        findViewById(R.id.nav_bar_logo).setOnLongClickListener(this);
+        preferences = getApplicationContext().getSharedPreferences(getDefaultSharedPreferencesName(), MODE_PRIVATE);
+
+    }
+
+    private String getDefaultSharedPreferencesName() {
+        return getApplicationContext().getPackageName() + "_preferences";
     }
 
     /**
@@ -120,4 +123,16 @@ public class MainActivity extends AppCompatActivity  {
         }
         return true;
      }
+
+    @Override
+    public boolean onLongClick(View v) {
+        boolean colourModeActivated = preferences.getBoolean("D4_COLS", false);
+        boolean newColourModeActivated = !colourModeActivated;
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("D4_COLS", newColourModeActivated);
+        editor.apply();
+        String toastText = newColourModeActivated ? "Colour mode activated" : "Colour mode deactivated";
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show());
+        return false;
+    }
 }
