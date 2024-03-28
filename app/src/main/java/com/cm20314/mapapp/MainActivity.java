@@ -39,15 +39,9 @@ import java.io.StringWriter;
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
 
     private ActivityMainBinding binding;
-    private Context context;
 
     public static ElevationService elevationService = new ElevationService();
     private SharedPreferences preferences;
-
-    static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -138,7 +132,12 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         editor.putBoolean("D4_COLS", newColourModeActivated);
         editor.apply();
         String toastText = newColourModeActivated ? "Colour mode activated" : "Colour mode deactivated";
-        Toast.makeText(context, toastText, Toast.LENGTH_SHORT).show();
+        try{
+            runOnUiThread(() -> Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show());
+        }
+        catch(Exception ex){
+            System.out.println("ERROR");
+        }
         return false;
     }
 }

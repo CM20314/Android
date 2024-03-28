@@ -37,6 +37,7 @@ import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.cm20314.mapapp.models.Container;
 import com.cm20314.mapapp.models.MapDataResponse;
 import com.cm20314.mapapp.models.MapSearchResponse;
+import com.cm20314.mapapp.models.NodeArcDirection;
 import com.cm20314.mapapp.models.RouteRequestData;
 import com.cm20314.mapapp.models.RouteResponseData;
 import com.cm20314.mapapp.services.Constants;
@@ -534,8 +535,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void UpdateDirections(){
         if(canvasView.routeData != null){
-            boolean res = routingService.updateDirectionCommand(canvasView.routeData.nodeArcDirections, locationService.getLocation(), directionsCommandTextView);
-            if(!res){
+            NodeArcDirection res = routingService.updateDirectionCommand(canvasView.routeData.nodeArcDirections, locationService.getLocation(), directionsCommandTextView);
+            canvasView.SetCurrentNodeArcDirection(res);
+            if(res == null){
                 // re-request directions
                 GetDirections();
             }
