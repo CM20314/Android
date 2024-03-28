@@ -46,12 +46,15 @@ import com.cm20314.mapapp.services.MapDataService;
 import com.cm20314.mapapp.services.RoutingService;
 import com.cm20314.mapapp.ui.CanvasView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.utils.storage.SharedPreferencesManager;
 
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -263,6 +266,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void drawMapContent(MapDataResponse content){
         System.out.println("Map downloaded.");
+        canvasView.SetColoursEnabled(preferences.getBoolean("D4_COLS", false));
         canvasView.SetMapData(content, locationService.getLocation(), getColor(com.google.android.material.R.attr.colorSecondaryVariant));
     }
 
@@ -372,6 +376,10 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         HideKeyboardAndDisableFocus(endSearchView);
         mapViewModel.destination = (String) parent.getItemAtPosition(position);
         SwitchUIToState(2);
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Container Name", mapViewModel.destination);
+        Analytics.trackEvent("Search item clicked", properties);
     }
 
     @Override
@@ -393,6 +401,14 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         requestData.endContainerName = endSearchView.getText().toString();
         boolean stepFree = preferences.getBoolean("stepFreeNav", false);
         if(stepFree) requestData.accessibilityLevel = 1;
+
+        Map<String, String> properties = new HashMap<>();
+        properties.put("Source X", String.valueOf(requestData.startCoordinate.x));
+        properties.put("Source Y", String.valueOf(requestData.startCoordinate.y));
+        properties.put("Destination", requestData.endContainerName);
+        properties.put("Step Free Activated", stepFree ? "y" : "n");
+        Analytics.trackEvent("Directions Requested", properties);
+
         routingService.requestPath(requestData, new IHttpRequestCallback<RouteResponseData>() {
             @Override
             public void onCompleted(HttpRequestService.HttpRequestResponse<RouteResponseData> response) {
@@ -428,11 +444,19 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         if (favouritesEditable.contains(mapViewModel.destination)){
             favouritesEditable.remove(mapViewModel.destination);
             favouriteButton.setImageResource(R.drawable.ic_star_red_24dp);
+
+            Map<String, String> properties = new HashMap<>();
+            properties.put("Container Name", mapViewModel.destination);
+            Analytics.trackEvent("Favourite deregistered", properties);
         }
 
         else{
            favouritesEditable.add(mapViewModel.destination);
            favouriteButton.setImageResource((R.drawable.ic_star_red_filled_24dp));
+
+            Map<String, String> properties = new HashMap<>();
+            properties.put("Container Name", mapViewModel.destination);
+            Analytics.trackEvent("Favourite registered", properties);
         }
 
         editor.putStringSet(Constants.FAVOURITES_SET_KEY,favouritesEditable);
@@ -443,7 +467,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     private boolean IsFavourite(String containerName){
 
         Set<String> favourites = preferences.getStringSet(Constants.FAVOURITES_SET_KEY,new HashSet<String>());
-        if (favourites.contains(mapViewModel.destination)){
+        if (favourites.contains(containerName)){
             return true;
         }
 

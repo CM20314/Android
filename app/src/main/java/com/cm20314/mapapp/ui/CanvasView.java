@@ -21,6 +21,7 @@ import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.models.Building;
@@ -58,6 +59,9 @@ public class CanvasView extends View {
 
     private double PADDING = 200;
     private int fillColor;
+    private boolean coloursEnabled = false;
+
+    private NodeArcDirection currentNodeArcDirection = null;
 
     public CanvasView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
@@ -181,6 +185,14 @@ public class CanvasView extends View {
         invalidate();
     }
 
+    public void SetColoursEnabled(boolean enabled){
+        coloursEnabled = enabled;
+    }
+
+    public void SetCurrentNodeArcDirection(NodeArcDirection direction){
+        currentNodeArcDirection = direction;
+    }
+
     public void UpdateRoute(RouteResponseData data, boolean invalidateMap){
         routeData = data;
         if(invalidateMap) {
@@ -254,7 +266,12 @@ public class CanvasView extends View {
 
             Paint fillPaint = new Paint();
             fillPaint.setStyle(Paint.Style.FILL);
-            fillPaint.setColor(fillColor);
+            if(coloursEnabled){
+                fillPaint.setColor(getFillColor(Constants.COLOURS.getOrDefault(building.shortName, 0)));
+            }
+            else {
+                fillPaint.setColor(fillColor);
+            }
             fillPaint.setAntiAlias(true);
             fillPaint.setDither(true);
 
@@ -292,7 +309,7 @@ public class CanvasView extends View {
         if(displayRoute){
             // Display the route
             Paint pathPaint = new Paint();
-            pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
+            pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
             pathPaint.setStyle(Paint.Style.STROKE);
             pathPaint.setStrokeWidth(8 / scaleFactor);
 
@@ -300,6 +317,10 @@ public class CanvasView extends View {
                     NodeArcDirection nodeArcDirection = routeData.nodeArcDirections.get(i);
                     Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
                     Coordinate endCoordinate = nodeArcDirection.nodeArc.node2.coordinate;
+
+                    if(nodeArcDirection.equals(currentNodeArcDirection)){
+                        pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
+                    }
 
                     float startX = (float) (startCoordinate.x);
                     float startY = (float) (startCoordinate.y);
@@ -320,5 +341,8 @@ public class CanvasView extends View {
         TypedValue typedValue = new TypedValue();
         getContext().getTheme().resolveAttribute(attrId, typedValue, true);
         return  typedValue.data;
+    }
+    private int getFillColor(int catId) {
+       return getResources().getColor(Constants.CAT_TO_COLOUR.getOrDefault(catId, R.color.vibrant_blue_light), getContext().getTheme());
     }
 }

@@ -17,5 +17,7 @@
     <color name="vibrant_blue_extra_light">#FF29B6F6</color>
     <color name="vibrant_blue_light">#FF039BE5</color>
     <color name="gray_400">#FFBDBDBD</color>
-    <color name="gray_600">#FF757575</color>
+    <color name="yellow">#FFC77D</color>
+    <color name="green">#AAF255</color>
+    <color name="purple">#D1C4E9</color>
 </resources>
