@@ -48,10 +48,12 @@ public class RoutingService {
         return direction;
     }
 
-    public String getDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location){
+    public NodeArcDirection getDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location){
         if(Math.pow((Math.pow(location.x - nodeArcDirections.get(nodeArcDirections.size() - 1).nodeArc.node2.coordinate.x, 2)
                 +Math.pow(location.y - nodeArcDirections.get(nodeArcDirections.size() - 1).nodeArc.node2.coordinate.y, 2)), 0.5) < Constants.MAX_DISTANCE_BEFORE_ARRIVED){
-            return "Arrive";
+            NodeArcDirection dir = nodeArcDirections.get(nodeArcDirections.size() - 1);
+            dir.direction = "Arrive";
+            return dir;
         }
 
         int nearestIndex = 0;

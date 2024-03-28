@@ -297,19 +297,16 @@ public class CanvasView extends View {
                 float midY = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble() + offset.y);
                 canvas.drawText(building.shortName, midX, midY, paint);
             }
-        // Draw location
-
-        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
-        paint.setStyle(Paint.Style.FILL);
-        paint.setAntiAlias(true);
-        canvas.drawCircle((float) location.x, (float) location.y, 10 / scaleFactor, paint);
-        paint.setAlpha(30);
-        canvas.drawCircle((float) location.x, (float) location.y, 80 / scaleFactor, paint);
 
         if(displayRoute){
             // Display the route
             Paint pathPaint = new Paint();
-            pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
+            if(!coloursEnabled){
+                pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
+            }
+            else{
+                pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
+            }
             pathPaint.setStyle(Paint.Style.STROKE);
             pathPaint.setStrokeWidth(8 / scaleFactor);
 
@@ -318,7 +315,7 @@ public class CanvasView extends View {
                     Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
                     Coordinate endCoordinate = nodeArcDirection.nodeArc.node2.coordinate;
 
-                    if(nodeArcDirection.equals(currentNodeArcDirection)){
+                    if(coloursEnabled && nodeArcDirection.equals(currentNodeArcDirection)){
                         pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
                     }
 
@@ -334,8 +331,15 @@ public class CanvasView extends View {
             pathPaint.setAntiAlias(true);
             Coordinate destCoord = routeData.nodeArcDirections.get(routeData.nodeArcDirections.size() - 1).nodeArc.node2.coordinate;
             canvas.drawCircle((float) destCoord.x, (float) destCoord.y, 10 / scaleFactor, pathPaint);
-
         }
+
+        // Draw location
+        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
+        paint.setStyle(Paint.Style.FILL);
+        paint.setAntiAlias(true);
+        canvas.drawCircle((float) location.x, (float) location.y, 12 / scaleFactor, paint);
+        paint.setAlpha(30);
+        canvas.drawCircle((float) location.x, (float) location.y, 80 / scaleFactor, paint);
     }
     private int getColor(int attrId){
         TypedValue typedValue = new TypedValue();
