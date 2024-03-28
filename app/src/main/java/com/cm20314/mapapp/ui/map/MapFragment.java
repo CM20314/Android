@@ -87,6 +87,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
     private TextView directionsEndTextView;
     private TextView directionsCommandTextView;
 
+    private ImageView favouritesIcon;
+    private ImageView recentsIcon;
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         mapViewModel = new ViewModelProvider(this).get(MapViewModel.class);
@@ -144,6 +147,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         directionsCommandTextView = root.findViewById(R.id.directions_command_text_view);
         directionsEndTextView = root.findViewById(R.id.directions_end_text_view);
 
+        favouritesIcon = root.findViewById(R.id.favourites_icon);
+        recentsIcon = root.findViewById(R.id.recents_icon);
+
         return root;
     }
 
@@ -188,6 +194,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
                 favouritesLayout.removeViewAt(1);
             }
         }
+        if(containerNames.size() > 0){
+            favouritesIcon.setVisibility(View.VISIBLE);
+        }
         for(String c : containerNames){
             Button btn = new Button(getContext());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
@@ -222,6 +231,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             for (int i = 1; i < childrenCount; i++){
                 recentsLayout.removeViewAt(1);
             }
+        }
+        if(recentSearches.size() > 0){
+            recentsIcon.setVisibility(View.VISIBLE);
         }
         for(String recentSearch : recentSearches){
             Button btn = new Button(getContext());
@@ -522,7 +534,11 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void UpdateDirections(){
         if(canvasView.routeData != null){
-            routingService.updateDirectionCommand(canvasView.routeData.nodeArcDirections, locationService.getLocation(), directionsCommandTextView);
+            boolean res = routingService.updateDirectionCommand(canvasView.routeData.nodeArcDirections, locationService.getLocation(), directionsCommandTextView);
+            if(!res){
+                // re-request directions
+                GetDirections();
+            }
         }
     }
 

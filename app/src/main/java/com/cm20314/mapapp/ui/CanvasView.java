@@ -299,7 +299,7 @@ public class CanvasView extends View {
             }
         // Draw location
 
-        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
+        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
         canvas.drawCircle((float) location.x, (float) location.y, 10 / scaleFactor, paint);

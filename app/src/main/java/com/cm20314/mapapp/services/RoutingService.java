@@ -48,14 +48,21 @@ public class RoutingService {
         return direction;
     }
 
-    public NodeArcDirection getDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location){
-        NodeArcDirection nearestNodeArcDirection = null;
+    public String getDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location){
+        if(Math.pow((Math.pow(location.x - nodeArcDirections.get(nodeArcDirections.size() - 1).nodeArc.node2.coordinate.x, 2)
+                +Math.pow(location.y - nodeArcDirections.get(nodeArcDirections.size() - 1).nodeArc.node2.coordinate.y, 2)), 0.5) < Constants.MAX_DISTANCE_BEFORE_ARRIVED){
+            return "Arrive";
+        }
+
+        int nearestIndex = 0;
         double shortestDistance = Integer.MAX_VALUE;
 
         for(int i = 0; i < nodeArcDirections.size(); i++){
-            double distance = Math.pow((Math.pow(location.x - nodeArcDirections.get(i).nodeArc.node2.coordinate.x, 2) +Math.pow(location.y - nodeArcDirections.get(i).nodeArc.node2.coordinate.y, 2)), 0.5);
+            double midX = (nodeArcDirections.get(i).nodeArc.node1.coordinate.x + nodeArcDirections.get(i).nodeArc.node2.coordinate.x) / 2;
+            double midY = (nodeArcDirections.get(i).nodeArc.node1.coordinate.y + nodeArcDirections.get(i).nodeArc.node2.coordinate.y) / 2;
+            double distance = Math.pow((Math.pow(location.x - midX, 2) +Math.pow(location.y - midY, 2)), 0.5);
             if(distance < shortestDistance){
-                nearestNodeArcDirection = nodeArcDirections.get(i);
+                nearestIndex = i;
                 shortestDistance = distance;
             }
         }
@@ -64,6 +71,10 @@ public class RoutingService {
             return null;
         }
 
+        if(nodeArcDirections.size() == nearestIndex + 1){
+            nearestIndex -= 1;
+        }
+        NodeArcDirection nearestNodeArcDirection = nodeArcDirections.get(nearestIndex + 1);
         if(nearestNodeArcDirection != null){
             if(nearestNodeArcDirection.direction.equals("")){
                 nearestNodeArcDirection.direction = "Walk";

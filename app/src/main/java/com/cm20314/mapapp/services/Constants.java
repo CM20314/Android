@@ -16,16 +16,19 @@ public class Constants {
     public static final String RECENTS1_KEY = "recents1";
     public static final String RECENTS2_KEY = "recents2";
     public static final String RECENTS3_KEY = "recents3";
-    public static final float[][] gpsToCoordinateMatrix = {
-            {(float) -3.980168073387700645e+01, (float) 5.198541668693133033e+01, (float) 2.166363287078652320e+03},
-            {(float) -7.478535695938515460e+01, (float) -5.015665286744024343e+00, (float) 3.831210580740634668e+03},
-            {(float) 6.821997535570057970e-18, (float) -4.878909776184769953e-19, (float) 9.999999999996478720e-04},
+
+
+    public static final double[][] gpsToCoordinateMatrix = {
+            {-7.62354283e+00, -9.29232860e+00,  3.69981637e+02},
+            {4.57287525e+00, 5.00011102e+00, -2.23405501e+02},
+            {-1.91384730e-02, 7.25339746e-03, 1.00000000e+00}
     };
 
 
     public static final float[] gpsOffset = {51.383272F, (float) -2.336011};
 
-    public static final double MAX_DISTANCE_TO_PATH_BEFORE_RECOMPUTING = 15;
+    public static final double MAX_DISTANCE_TO_PATH_BEFORE_RECOMPUTING = 20;
+    public static final double MAX_DISTANCE_BEFORE_ARRIVED = 5;
 
     public static Map<String, Coordinate> TEXT_OFFSETS = new HashMap<String, Coordinate>();
     public static Map<String, Integer> COLOURS = new HashMap<String, Integer>();
