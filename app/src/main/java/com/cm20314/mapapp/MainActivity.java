@@ -132,12 +132,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         editor.putBoolean("D4_COLS", newColourModeActivated);
         editor.apply();
         String toastText = newColourModeActivated ? "Colour mode activated" : "Colour mode deactivated";
-        try{
-            runOnUiThread(() -> Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show());
-        }
-        catch(Exception ex){
-            System.out.println("ERROR");
-        }
+        runOnUiThread(() -> Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show());
         return false;
     }
 }
