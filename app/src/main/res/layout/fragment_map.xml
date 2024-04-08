@@ -116,7 +116,7 @@
                 android:src="@drawable/ic_star_black"
                 android:padding="2dp"
                 android:contentDescription="@string/search_icon_desc"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
 
         </LinearLayout>
         <LinearLayout
@@ -136,7 +136,7 @@
                 android:layout_marginEnd="8dp"
                 android:src="@drawable/ic_history_black_24dp"
                 android:contentDescription="@string/search_icon_desc"
-                android:visibility="gone"/>
+                android:visibility="visible"/>
 
         </LinearLayout>
 
@@ -149,14 +149,48 @@
             android:layout_margin="16dp"
             android:src="@drawable/arrow_back_white_24dp"
             />
-        <Button
-            android:id="@+id/get_directions_button"
+
+        <LinearLayout
+            android:id="@+id/get_directions_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/get_directions_button_style"
-            android:layout_margin="8dp"
-            android:text="@string/get_directions"
-            android:textSize="16sp"/>
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:paddingEnd="8dp"
+            android:paddingStart="0dp">
+
+            <Button
+                android:id="@+id/get_directions_button"
+                android:layout_width="wrap_content"
+                android:layout_weight="100"
+                android:layout_height="wrap_content"
+                android:background="@drawable/get_directions_button_style"
+                android:text="@string/get_directions"
+                android:layout_marginEnd="8dp"
+                android:textSize="16sp"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:background="@drawable/search_bar_style">
+                <CheckBox
+                    android:id="@+id/step_free_checkbox"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"/>
+                <ImageView
+                    android:id="@+id/step_free_icon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginEnd="5dp"
+                    android:src="@drawable/accessible_24dp"
+                    android:padding="0dp"
+                    android:layout_marginStart="0dp"
+                    android:contentDescription="@string/search_icon_desc" />
+            </LinearLayout>
+        </LinearLayout>
 
     </LinearLayout>
 

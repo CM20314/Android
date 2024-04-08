@@ -1,5 +1,8 @@
 package com.cm20314.mapapp.services;
 
+import android.graphics.Color;
+
+import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.models.Coordinate;
 
 import java.util.Dictionary;
@@ -28,6 +31,8 @@ public class Constants {
     public static final double MAX_DISTANCE_BEFORE_ARRIVED = 5;
 
     public static Map<String, Coordinate> TEXT_OFFSETS = new HashMap<String, Coordinate>();
+    public static Map<String, Integer> COLOURS = new HashMap<String, Integer>();
+    public static Map<Integer, Integer> CAT_TO_COLOUR = new HashMap<Integer, Integer>();
 
     public static void Initialise(){
         TEXT_OFFSETS.put("7W", new Coordinate(-9, 0));
@@ -59,5 +64,75 @@ public class Constants {
         TEXT_OFFSETS.put("Bobsleigh Track", new Coordinate(0, 45));
         TEXT_OFFSETS.put("Shooting Range", new Coordinate(-13, 21.5));
         TEXT_OFFSETS.put("South Football Pitch", new Coordinate(-1, 0));
+
+        // 0 - normal
+        // 1 - miscellaneous
+        // 2 - student spaces
+        // 3 - sport facilities
+        // 4 - sport pitches
+        COLOURS.put("1W", 0);
+        COLOURS.put("2W", 0);
+        COLOURS.put("3W", 0);
+        COLOURS.put("4W", 0);
+        COLOURS.put("5W", 0);
+        COLOURS.put("6W", 0);
+        COLOURS.put("7W", 0);
+        COLOURS.put("8W", 0);
+        COLOURS.put("9W", 0);
+        COLOURS.put("10W", 0);
+        COLOURS.put("1E", 0);
+        COLOURS.put("2E", 0);
+        COLOURS.put("3E", 0);
+        COLOURS.put("4E", 0);
+        COLOURS.put("5E", 0);
+        COLOURS.put("6E", 0);
+        COLOURS.put("7E", 0);
+        COLOURS.put("8E", 0);
+        COLOURS.put("9E", 0);
+        COLOURS.put("10E", 0);
+        COLOURS.put("1S", 0);
+        COLOURS.put("2S", 0);
+        COLOURS.put("3S", 0);
+        COLOURS.put("4S", 0);
+        COLOURS.put("4SA", 0);
+        COLOURS.put("3WA", 0);
+        COLOURS.put("5S", 1);
+        COLOURS.put("6WS", 0);
+        COLOURS.put("3WN", 0);
+        COLOURS.put("1WN", 0);
+        COLOURS.put("Library", 2);
+        COLOURS.put("UH", 2);
+        COLOURS.put("CB", 0);
+        COLOURS.put("SU", 2);
+        COLOURS.put("Chaplaincy", 1);
+        COLOURS.put("Norwood House", 1);
+        COLOURS.put("WH", 1);
+        COLOURS.put("FH", 2);
+        COLOURS.put("3G", 4);
+        COLOURS.put("4W Cafe", 2);
+        COLOURS.put("Astro", 4);
+        COLOURS.put("Track", 3);
+        COLOURS.put("Volleyball", 3);
+        COLOURS.put("Bobsleigh Track", 3);
+        COLOURS.put("Clay", 3);
+        COLOURS.put("Eastwood Pitches", 4);
+        COLOURS.put("Estates", 1);
+        COLOURS.put("Hockey", 4);
+        COLOURS.put("Limekiln Pitches", 4);
+        COLOURS.put("Medical Centre", 1);
+        COLOURS.put("Tennis Courts", 3);
+        COLOURS.put("Rugby Pitch", 4);
+        COLOURS.put("Shooting Range", 3);
+        COLOURS.put("South Football Pitch", 4);
+        COLOURS.put("STV", 3);
+        COLOURS.put("St John's Pitches", 4);
+        COLOURS.put("The Edge", 2);
+        COLOURS.put("Lime Tree", 2);
+
+        CAT_TO_COLOUR.put(0, R.color.vibrant_blue_light);
+        CAT_TO_COLOUR.put(1, R.color.yellow);
+        CAT_TO_COLOUR.put(2, R.color.purple);
+        CAT_TO_COLOUR.put(3, R.color.green);
+        CAT_TO_COLOUR.put(4, R.color.dark_green);
     }
 }

@@ -1,6 +1,8 @@
 package com.cm20314.mapapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
 import android.content.pm.PackageManager;
@@ -30,22 +32,18 @@ import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 import android.Manifest;
 import android.view.KeyEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import java.io.StringWriter;
 
 
-public class MainActivity extends AppCompatActivity  {
+public class MainActivity extends AppCompatActivity{
 
     private ActivityMainBinding binding;
-    private Context context;
 
     public static ElevationService elevationService = new ElevationService();
-
-    static String convertStreamToString(java.io.InputStream is) {
-        java.util.Scanner s = new java.util.Scanner(is).useDelimiter("\\A");
-        return s.hasNext() ? s.next() : "";
-    }
+    private SharedPreferences preferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,15 +57,14 @@ public class MainActivity extends AppCompatActivity  {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_map, R.id.navigation_settings)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+//                R.id.navigation_map, R.id.navigation_settings)
+//                .build();
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+//        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+//        NavigationUI.setupWithNavController(binding.navView, navController);
 
         //getting location permissions
         if (!permissionsGranted()){
@@ -75,6 +72,11 @@ public class MainActivity extends AppCompatActivity  {
         }
 
         HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
+        preferences = getApplicationContext().getSharedPreferences(getDefaultSharedPreferencesName(), MODE_PRIVATE);
+    }
+
+    private String getDefaultSharedPreferencesName() {
+        return getApplicationContext().getPackageName() + "_preferences";
     }
 
     /**

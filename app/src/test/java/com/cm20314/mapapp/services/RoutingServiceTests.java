@@ -30,7 +30,7 @@ public class RoutingServiceTests {
 
     @Test
     public void DirectionTextTest1(){
-        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(200, 460));
+        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(200, 460)).direction;
         String expectedOutput = "Walk";
 
         assertEquals(expectedOutput, directionCommand);
@@ -38,7 +38,7 @@ public class RoutingServiceTests {
 
     @Test
     public void DirectionTextTest2(){
-        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(183, 460));
+        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(183, 460)).direction;
         String expectedOutput = "false";
 
         assertEquals(expectedOutput, directionCommand);
@@ -46,16 +46,16 @@ public class RoutingServiceTests {
 
     @Test
     public void DirectionTextTest3(){
-        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 460));
-        String expectedOutput = "Arrive";
+        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 460)).direction;
+        String expectedOutput = "Walk";
 
         assertEquals(expectedOutput, directionCommand);
     }
 
     @Test
     public void DirectionTextTest4(){
-        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 463));
-        String expectedOutput = "Arrive";
+        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 463)).direction;
+        String expectedOutput = "Turn Right";
 
         assertEquals(expectedOutput, directionCommand);
     }
