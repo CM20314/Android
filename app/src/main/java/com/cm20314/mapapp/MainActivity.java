@@ -1,6 +1,8 @@
 package com.cm20314.mapapp;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
 import android.content.pm.PackageManager;
@@ -57,12 +59,12 @@ public class MainActivity extends AppCompatActivity{
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
-        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.navigation_map, R.id.navigation_settings)
-                .build();
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(binding.navView, navController);
+//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
+//                R.id.navigation_map, R.id.navigation_settings)
+//                .build();
+//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+//        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
+//        NavigationUI.setupWithNavController(binding.navView, navController);
 
         //getting location permissions
         if (!permissionsGranted()){
@@ -71,7 +73,6 @@ public class MainActivity extends AppCompatActivity{
 
         HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
         preferences = getApplicationContext().getSharedPreferences(getDefaultSharedPreferencesName(), MODE_PRIVATE);
-
     }
 
     private String getDefaultSharedPreferencesName() {

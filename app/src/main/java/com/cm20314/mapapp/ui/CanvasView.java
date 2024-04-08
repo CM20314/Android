@@ -339,9 +339,17 @@ public class CanvasView extends View {
         paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
         paint.setStyle(Paint.Style.FILL);
         paint.setAntiAlias(true);
-        canvas.drawCircle((float) location.x, (float) location.y, 12 / scaleFactor, paint);
+
         paint.setAlpha(30);
         canvas.drawCircle((float) location.x, (float) location.y, 80 / scaleFactor, paint);
+
+        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
+        paint.setAlpha(255);
+        canvas.drawCircle((float) location.x, (float) location.y, 12 / scaleFactor, paint);
+
+        paint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
+        canvas.drawCircle((float) location.x, (float) location.y, 9 / scaleFactor, paint);
+
     }
     private int getColor(int attrId){
         TypedValue typedValue = new TypedValue();
