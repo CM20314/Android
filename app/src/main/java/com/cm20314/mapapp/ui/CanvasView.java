@@ -59,7 +59,8 @@ public class CanvasView extends View {
 
     private double PADDING = 200;
     private int fillColor;
-    private boolean coloursEnabled = false;
+    private boolean coloursEnabledPaths = false;
+    private boolean coloursEnabledBuildings = false;
 
     private NodeArcDirection currentNodeArcDirection = null;
 
@@ -185,8 +186,9 @@ public class CanvasView extends View {
         invalidate();
     }
 
-    public void SetColoursEnabled(boolean enabled){
-        coloursEnabled = enabled;
+    public void SetColoursEnabled(boolean enabledPaths, boolean enabledBuildings){
+        coloursEnabledPaths = enabledPaths;
+        coloursEnabledBuildings = enabledBuildings;
     }
 
     public void SetCurrentNodeArcDirection(NodeArcDirection direction){
@@ -266,7 +268,7 @@ public class CanvasView extends View {
 
             Paint fillPaint = new Paint();
             fillPaint.setStyle(Paint.Style.FILL);
-            if(coloursEnabled){
+            if(coloursEnabledBuildings){
                 fillPaint.setColor(getFillColor(Constants.COLOURS.getOrDefault(building.shortName, 0)));
             }
             else {
@@ -301,7 +303,7 @@ public class CanvasView extends View {
         if(displayRoute){
             // Display the route
             Paint pathPaint = new Paint();
-            if(!coloursEnabled){
+            if(!coloursEnabledPaths){
                 pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
             }
             else{
@@ -315,7 +317,7 @@ public class CanvasView extends View {
                     Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
                     Coordinate endCoordinate = nodeArcDirection.nodeArc.node2.coordinate;
 
-                    if(coloursEnabled && nodeArcDirection.equals(currentNodeArcDirection)){
+                    if(coloursEnabledPaths && nodeArcDirection.equals(currentNodeArcDirection)){
                         pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
                     }
 

@@ -59,7 +59,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, TextWatcher {
+public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, TextWatcher, View.OnLongClickListener  {
 
     private FragmentMapBinding binding;
     private AutoCompleteTextView startSearchView;
@@ -150,6 +150,10 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
         favouritesIcon = root.findViewById(R.id.favourites_icon);
         recentsIcon = root.findViewById(R.id.recents_icon);
+
+
+        favouritesIcon.setOnLongClickListener(this);
+        recentsIcon.setOnLongClickListener(this);
 
         return root;
     }
@@ -279,8 +283,12 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void drawMapContent(MapDataResponse content){
         System.out.println("Map downloaded.");
-        canvasView.SetColoursEnabled(preferences.getBoolean("D4_COLS", false));
+        fetchColourSettings();
         canvasView.SetMapData(content, locationService.getLocation(), getColor(com.google.android.material.R.attr.colorSecondaryVariant));
+    }
+
+    private void fetchColourSettings(){
+        canvasView.SetColoursEnabled(preferences.getBoolean("D4_COLS_P", false), preferences.getBoolean("D4_COLS_B", false));
     }
 
     private void SwitchUIToState(int state){
@@ -548,5 +556,33 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         TypedValue typedValue = new TypedValue();
         getContext().getTheme().resolveAttribute(attrId, typedValue, true);
         return  typedValue.data;
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        boolean colourModeActivatedPaths = preferences.getBoolean("D4_COLS_P", false);
+        boolean colourModeActivatedBuildings = preferences.getBoolean("D4_COLS_B", false);
+
+        SharedPreferences.Editor editor = preferences.edit();
+        String toastText;
+
+        if(v.getId() == R.id.favourites_icon){
+            boolean newColourModeActivatedPaths = !colourModeActivatedPaths;
+            editor.putBoolean("D4_COLS_P", newColourModeActivatedPaths);
+            toastText = newColourModeActivatedPaths ? "Paths: Colour mode activated" : "Paths: Colour mode deactivated";
+        }
+        else if(v.getId() == R.id.recents_icon){
+            boolean newColourModeActivatedBuildings = !colourModeActivatedBuildings;
+            editor.putBoolean("D4_COLS_B", newColourModeActivatedBuildings);
+            toastText = newColourModeActivatedBuildings ? "Buildings: Colour mode activated" : "Buildings: Colour mode deactivated";
+        } else {
+            toastText = "";
+        }
+
+
+        editor.apply();
+        Toast.makeText(getContext(), toastText, Toast.LENGTH_SHORT).show();
+        fetchColourSettings();
+        return false;
     }
 }

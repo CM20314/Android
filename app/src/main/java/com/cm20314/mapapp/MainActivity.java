@@ -36,7 +36,7 @@ import android.widget.Toast;
 import java.io.StringWriter;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
+public class MainActivity extends AppCompatActivity{
 
     private ActivityMainBinding binding;
 
@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
@@ -71,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
 
         HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
-        findViewById(R.id.nav_bar_logo).setOnLongClickListener(this);
         preferences = getApplicationContext().getSharedPreferences(getDefaultSharedPreferencesName(), MODE_PRIVATE);
 
     }
@@ -123,16 +121,4 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
         }
         return true;
      }
-
-    @Override
-    public boolean onLongClick(View v) {
-        boolean colourModeActivated = preferences.getBoolean("D4_COLS", false);
-        boolean newColourModeActivated = !colourModeActivated;
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putBoolean("D4_COLS", newColourModeActivated);
-        editor.apply();
-        String toastText = newColourModeActivated ? "Colour mode activated" : "Colour mode deactivated";
-        runOnUiThread(() -> Toast.makeText(getApplicationContext(), toastText, Toast.LENGTH_SHORT).show());
-        return false;
-    }
 }
