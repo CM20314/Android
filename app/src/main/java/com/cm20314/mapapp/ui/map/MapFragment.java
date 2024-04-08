@@ -1,6 +1,8 @@
 package com.cm20314.mapapp.ui.map;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
@@ -19,6 +21,8 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -31,6 +35,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.cm20314.mapapp.MainActivity;
 import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.databinding.FragmentMapBinding;
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
@@ -59,7 +64,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, TextWatcher {
+public class MapFragment extends Fragment implements AdapterView.OnItemClickListener, View.OnClickListener, TextWatcher, View.OnLongClickListener, CompoundButton.OnCheckedChangeListener  {
 
     private FragmentMapBinding binding;
     private AutoCompleteTextView startSearchView;
@@ -90,6 +95,11 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private ImageView favouritesIcon;
     private ImageView recentsIcon;
+
+    private CheckBox stepFreeCheckbox;
+    private LinearLayout getDirectionsLayout;
+
+    private boolean stepFree;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -151,6 +161,16 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouritesIcon = root.findViewById(R.id.favourites_icon);
         recentsIcon = root.findViewById(R.id.recents_icon);
 
+        stepFreeCheckbox = root.findViewById(R.id.step_free_checkbox);
+
+        getDirectionsLayout = root.findViewById(R.id.get_directions_layout);
+
+        favouritesIcon.setOnLongClickListener(this);
+        recentsIcon.setOnLongClickListener(this);
+
+        getStepFreeFromPreferences();
+        stepFreeCheckbox.setOnCheckedChangeListener(this);
+
         return root;
     }
 
@@ -160,6 +180,32 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         loadMapData();
 
         SwitchUIToState(1);
+
+        if(true){//preferences.getBoolean("firstLaunch", true)){
+            preferences.edit().putBoolean("firstLaunch", false).apply();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            builder.setIcon(R.drawable.accessible_24dp);
+            builder.setTitle("Step-free Navigation");
+            builder.setMessage("Would you like to enable step-free navigation?");
+            builder.setNegativeButton("NO", null);
+
+            builder.setPositiveButton("YES", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Toast.makeText(getContext(), "Step-free enabled", Toast.LENGTH_SHORT).show();
+                    preferences.edit().putBoolean("stepFreeNav", true).apply();
+                    getStepFreeFromPreferences();
+                }
+            });
+
+            AlertDialog alertDialog = builder.create();
+            alertDialog.show();
+        }
+    }
+
+    private void getStepFreeFromPreferences(){
+        stepFree = preferences.getBoolean("stepFreeNav", false);
+        stepFreeCheckbox.setChecked(stepFree);
     }
 
     private static String getDefaultSharedPreferencesName(Context context) {
@@ -195,9 +241,6 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
                 favouritesLayout.removeViewAt(1);
             }
         }
-        if(containerNames.size() > 0){
-            favouritesIcon.setVisibility(View.VISIBLE);
-        }
         for(String c : containerNames){
             Button btn = new Button(getContext());
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams
@@ -232,9 +275,6 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
             for (int i = 1; i < childrenCount; i++){
                 recentsLayout.removeViewAt(1);
             }
-        }
-        if(recentSearches.size() > 0){
-            recentsIcon.setVisibility(View.VISIBLE);
         }
         for(String recentSearch : recentSearches){
             Button btn = new Button(getContext());
@@ -279,8 +319,12 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
 
     private void drawMapContent(MapDataResponse content){
         System.out.println("Map downloaded.");
-        canvasView.SetColoursEnabled(preferences.getBoolean("D4_COLS", false));
+        fetchColourSettings();
         canvasView.SetMapData(content, locationService.getLocation(), getColor(com.google.android.material.R.attr.colorSecondaryVariant));
+    }
+
+    private void fetchColourSettings(){
+        canvasView.SetColoursEnabled(preferences.getBoolean("D4_COLS_P", false), preferences.getBoolean("D4_COLS_B", false));
     }
 
     private void SwitchUIToState(int state){
@@ -304,8 +348,9 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouritesLayout.setVisibility(View.VISIBLE);
         recentsLayout.setVisibility(View.VISIBLE);
         favouriteButton.setVisibility(View.GONE);
-        getDirectionsButton.setVisibility(View.GONE);
+        getDirectionsLayout.setVisibility(View.GONE);
         exitDirectionsButton.setVisibility(View.GONE);
+        startSearchView.setText("");
         ConfigureFavourites(preferences.getStringSet(Constants.FAVOURITES_SET_KEY,new HashSet<>()));
         ConfigureRecents(getRecents());
     }
@@ -317,7 +362,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouritesLayout.setVisibility(View.GONE);
         recentsLayout.setVisibility(View.GONE);
         favouriteButton.setVisibility(View.VISIBLE);
-        getDirectionsButton.setVisibility(View.VISIBLE);
+        getDirectionsLayout.setVisibility(View.VISIBLE);
         exitDirectionsButton.setVisibility(View.GONE);
 
         startSearchView.setText(R.string.my_location);
@@ -341,7 +386,7 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         favouritesLayout.setVisibility(View.GONE);
         recentsLayout.setVisibility(View.GONE);
         favouriteButton.setVisibility(View.GONE);
-        getDirectionsButton.setVisibility(View.GONE);
+        getDirectionsLayout.setVisibility(View.GONE);
         exitDirectionsButton.setVisibility(View.VISIBLE);
     }
 
@@ -412,7 +457,6 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         RouteRequestData requestData = new RouteRequestData();
         requestData.startCoordinate = locationService.getLocation();
         requestData.endContainerName = endSearchView.getText().toString();
-        boolean stepFree = preferences.getBoolean("stepFreeNav", false);
         if(stepFree) requestData.accessibilityLevel = 1;
 
         Map<String, String> properties = new HashMap<>();
@@ -548,5 +592,41 @@ public class MapFragment extends Fragment implements AdapterView.OnItemClickList
         TypedValue typedValue = new TypedValue();
         getContext().getTheme().resolveAttribute(attrId, typedValue, true);
         return  typedValue.data;
+    }
+
+    @Override
+    public boolean onLongClick(View v) {
+        boolean colourModeActivatedPaths = preferences.getBoolean("D4_COLS_P", false);
+        boolean colourModeActivatedBuildings = preferences.getBoolean("D4_COLS_B", false);
+
+        SharedPreferences.Editor editor = preferences.edit();
+        String toastText;
+
+        if(v.getId() == R.id.favourites_icon){
+            boolean newColourModeActivatedPaths = !colourModeActivatedPaths;
+            editor.putBoolean("D4_COLS_P", newColourModeActivatedPaths);
+            toastText = newColourModeActivatedPaths ? "Paths: Colour mode activated" : "Paths: Colour mode deactivated";
+        }
+        else if(v.getId() == R.id.recents_icon){
+            boolean newColourModeActivatedBuildings = !colourModeActivatedBuildings;
+            editor.putBoolean("D4_COLS_B", newColourModeActivatedBuildings);
+            toastText = newColourModeActivatedBuildings ? "Buildings: Colour mode activated" : "Buildings: Colour mode deactivated";
+        } else {
+            toastText = "";
+        }
+
+
+        editor.apply();
+        Toast.makeText(getContext(), toastText, Toast.LENGTH_SHORT).show();
+        fetchColourSettings();
+        return false;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        stepFree = !stepFree;
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putBoolean("stepFreeNav", stepFree);
+        editor.apply();
     }
 }
