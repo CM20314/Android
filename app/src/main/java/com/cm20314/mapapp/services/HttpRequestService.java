@@ -12,11 +12,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -65,7 +67,7 @@ public class HttpRequestService<TIn, TOut> {
             }
 
             try {
-                URL url = new URL(uri);
+                URL url = new URL(uri.replace(" ", "%20"));
                 HttpURLConnection connection = (HttpURLConnection) url.openConnection();
                 connection.setRequestMethod(method);
 
@@ -94,7 +96,9 @@ public class HttpRequestService<TIn, TOut> {
                     httpResponse.ConnectionSucceeded = true;
                 }
 
-            } catch (Exception e) {
+            } catch (FileNotFoundException e) {
+                httpResponse.ConnectionSucceeded = false;
+            }catch (Exception e) {
                 httpResponse.ConnectionSucceeded = false;
                 handleException();
             }

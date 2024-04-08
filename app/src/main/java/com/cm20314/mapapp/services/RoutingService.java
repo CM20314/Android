@@ -40,28 +40,50 @@ public class RoutingService {
     }
 
     public boolean updateDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location, TextView directionTextView){
-        NodeArcDirection nearestNodeArcDirection = null;
+        String directionCommand = getDirectionCommand(nodeArcDirections, location);
+        if(directionCommand.equals("false")){
+            return false;
+        }
+        directionTextView.setText(directionCommand);
+        return true;
+    }
+
+    public String getDirectionCommand(List<NodeArcDirection> nodeArcDirections, Coordinate location){
+        if(Math.pow((Math.pow(location.x - nodeArcDirections.get(nodeArcDirections.size() - 1).nodeArc.node2.coordinate.x, 2)
+                +Math.pow(location.y - nodeArcDirections.get(nodeArcDirections.size() - 1).nodeArc.node2.coordinate.y, 2)), 0.5) < Constants.MAX_DISTANCE_BEFORE_ARRIVED){
+            return "Arrive";
+        }
+
+        int nearestIndex = 0;
         double shortestDistance = Integer.MAX_VALUE;
 
         for(int i = 0; i < nodeArcDirections.size(); i++){
-            double distance = Math.pow((Math.pow(location.x - nodeArcDirections.get(i).nodeArc.node2.coordinate.x, 2) +Math.pow(location.y - nodeArcDirections.get(i).nodeArc.node2.coordinate.y, 2)), 0.5);
+            double midX = (nodeArcDirections.get(i).nodeArc.node1.coordinate.x + nodeArcDirections.get(i).nodeArc.node2.coordinate.x) / 2;
+            double midY = (nodeArcDirections.get(i).nodeArc.node1.coordinate.y + nodeArcDirections.get(i).nodeArc.node2.coordinate.y) / 2;
+            double distance = Math.pow((Math.pow(location.x - midX, 2) +Math.pow(location.y - midY, 2)), 0.5);
             if(distance < shortestDistance){
-                nearestNodeArcDirection = nodeArcDirections.get(i);
+                nearestIndex = i;
                 shortestDistance = distance;
             }
         }
 
         if(shortestDistance > Constants.MAX_DISTANCE_TO_PATH_BEFORE_RECOMPUTING){
-            return false;
+            return "false";
         }
 
+        if(nodeArcDirections.size() == nearestIndex + 1){
+            nearestIndex -= 1;
+        }
+        NodeArcDirection nearestNodeArcDirection = nodeArcDirections.get(nearestIndex + 1);
         if(nearestNodeArcDirection != null){
             String directionCommand = nearestNodeArcDirection.direction;
             if(directionCommand.equals("")){
                 directionCommand = "Walk";
             }
-            directionTextView.setText(directionCommand);
+
+            return directionCommand;
         }
-        return true;
+
+        return "false";
     }
 }

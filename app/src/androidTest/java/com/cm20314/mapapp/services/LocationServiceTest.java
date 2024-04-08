@@ -26,7 +26,6 @@ import static org.junit.Assert.*;
 import com.cm20314.mapapp.MainActivity;
 import com.cm20314.mapapp.services.LocationService;
 
-
 @RunWith(AndroidJUnit4.class)
 public class LocationServiceTest {
 
@@ -69,7 +68,7 @@ public class LocationServiceTest {
         locationManager.setTestProviderLocation(LocationManager.GPS_PROVIDER, mockLocation);
         //idk what this line does but otherwise the location service doesn't work
         Looper.prepare();
-        float[] coords = locationService.getLatAndLong();
+        double[] coords = locationService.getLatAndLong();
         assertTrue(coords[0] != 0 || coords[1] != 0);
     }
 }
