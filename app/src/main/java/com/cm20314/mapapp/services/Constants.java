@@ -121,7 +121,7 @@ public class Constants {
         COLOURS.put("Limekiln Pitches", 4);
         COLOURS.put("Medical Centre", 1);
         COLOURS.put("Tennis Courts", 3);
-        COLOURS.put("Rugby Pitches", 4);
+        COLOURS.put("Rugby Pitch", 4);
         COLOURS.put("Shooting Range", 3);
         COLOURS.put("South Football Pitch", 4);
         COLOURS.put("STV", 3);
