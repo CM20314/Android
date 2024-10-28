@@ -9,29 +9,44 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * System constants
+ */
 public class Constants {
+    /** Root URL for backend requests */
     public static final String API_ROOT = "https://cm20314.azurewebsites.net/api";
+    /**Shared preferences key for favourite destinations*/
     public static final String FAVOURITES_SET_KEY = "favourites_set";
 
+    /**Shared preferences key for recent destinations (position 1)*/
     public static final String RECENTS1_KEY = "recents1";
+    /**Shared preferences key for recent destinations (position 2)*/
     public static final String RECENTS2_KEY = "recents2";
+    /**Shared preferences key for recent destinations (position 3)*/
     public static final String RECENTS3_KEY = "recents3";
+    /**Shared preferences key for colours enabled (paths)*/
+    public static final String COLOURS_PATHS = "D4_COLS_P";
+    /**Shared preferences key for colours enabled (buildings)*/
+    public static final String COLOURS_BUILDINGS = "D4_COLS_B";
 
-
+    /** GPS to Cartesian conversion matrix */
     public static final double[][] gpsToCoordinateMatrix = {
             {-7.62354283e+00, -9.29232860e+00,  3.69981637e+02},
             {4.57287525e+00, 5.00011102e+00, -2.23405501e+02},
             {-1.91384730e-02, 7.25339746e-03, 1.00000000e+00}
     };
-
-
-    public static final float[] gpsOffset = {51.383272F, (float) -2.336011};
+    public static float MAX_ZOOM = 10f;
+    public static float MIN_ZOOM = 1f;
+    public static float PADDING = 200;
 
     public static final double MAX_DISTANCE_TO_PATH_BEFORE_RECOMPUTING = 20;
-    public static final double MAX_DISTANCE_BEFORE_ARRIVED = 5;
+    public static final double MAX_DISTANCE_BEFORE_ARRIVED = 3;
 
+    /** Offsets for labels on maps (to appear more aesthetic) */
     public static Map<String, Coordinate> TEXT_OFFSETS = new HashMap<String, Coordinate>();
-    public static Map<String, Integer> COLOURS = new HashMap<String, Integer>();
+    /** Categories for buildings (colour-coded) */
+    public static Map<String, Integer> CATEGORIES = new HashMap<String, Integer>();
+    /** Colours for each building category */
     public static Map<Integer, Integer> CAT_TO_COLOUR = new HashMap<Integer, Integer>();
 
     public static void Initialise(){
@@ -70,64 +85,64 @@ public class Constants {
         // 2 - student spaces
         // 3 - sport facilities
         // 4 - sport pitches
-        COLOURS.put("1W", 0);
-        COLOURS.put("2W", 0);
-        COLOURS.put("3W", 0);
-        COLOURS.put("4W", 0);
-        COLOURS.put("5W", 0);
-        COLOURS.put("6W", 0);
-        COLOURS.put("7W", 0);
-        COLOURS.put("8W", 0);
-        COLOURS.put("9W", 0);
-        COLOURS.put("10W", 0);
-        COLOURS.put("1E", 0);
-        COLOURS.put("2E", 0);
-        COLOURS.put("3E", 0);
-        COLOURS.put("4E", 0);
-        COLOURS.put("5E", 0);
-        COLOURS.put("6E", 0);
-        COLOURS.put("7E", 0);
-        COLOURS.put("8E", 0);
-        COLOURS.put("9E", 0);
-        COLOURS.put("10E", 0);
-        COLOURS.put("1S", 0);
-        COLOURS.put("2S", 0);
-        COLOURS.put("3S", 0);
-        COLOURS.put("4S", 0);
-        COLOURS.put("4SA", 0);
-        COLOURS.put("3WA", 0);
-        COLOURS.put("5S", 1);
-        COLOURS.put("6WS", 0);
-        COLOURS.put("3WN", 0);
-        COLOURS.put("1WN", 0);
-        COLOURS.put("Library", 2);
-        COLOURS.put("UH", 2);
-        COLOURS.put("CB", 0);
-        COLOURS.put("SU", 2);
-        COLOURS.put("Chaplaincy", 1);
-        COLOURS.put("Norwood House", 1);
-        COLOURS.put("WH", 1);
-        COLOURS.put("FH", 2);
-        COLOURS.put("3G", 4);
-        COLOURS.put("4W Cafe", 2);
-        COLOURS.put("Astro", 4);
-        COLOURS.put("Track", 3);
-        COLOURS.put("Volleyball", 3);
-        COLOURS.put("Bobsleigh Track", 3);
-        COLOURS.put("Clay", 3);
-        COLOURS.put("Eastwood Pitches", 4);
-        COLOURS.put("Estates", 1);
-        COLOURS.put("Hockey", 4);
-        COLOURS.put("Limekiln Pitches", 4);
-        COLOURS.put("Medical Centre", 1);
-        COLOURS.put("Tennis Courts", 3);
-        COLOURS.put("Rugby Pitch", 4);
-        COLOURS.put("Shooting Range", 3);
-        COLOURS.put("South Football Pitch", 4);
-        COLOURS.put("STV", 3);
-        COLOURS.put("St John's Pitches", 4);
-        COLOURS.put("The Edge", 2);
-        COLOURS.put("Lime Tree", 2);
+        CATEGORIES.put("1W", 0);
+        CATEGORIES.put("2W", 0);
+        CATEGORIES.put("3W", 0);
+        CATEGORIES.put("4W", 0);
+        CATEGORIES.put("5W", 0);
+        CATEGORIES.put("6W", 0);
+        CATEGORIES.put("7W", 0);
+        CATEGORIES.put("8W", 0);
+        CATEGORIES.put("9W", 0);
+        CATEGORIES.put("10W", 0);
+        CATEGORIES.put("1E", 0);
+        CATEGORIES.put("2E", 0);
+        CATEGORIES.put("3E", 0);
+        CATEGORIES.put("4E", 0);
+        CATEGORIES.put("5E", 0);
+        CATEGORIES.put("6E", 0);
+        CATEGORIES.put("7E", 0);
+        CATEGORIES.put("8E", 0);
+        CATEGORIES.put("9E", 0);
+        CATEGORIES.put("10E", 0);
+        CATEGORIES.put("1S", 0);
+        CATEGORIES.put("2S", 0);
+        CATEGORIES.put("3S", 0);
+        CATEGORIES.put("4S", 0);
+        CATEGORIES.put("4SA", 0);
+        CATEGORIES.put("3WA", 0);
+        CATEGORIES.put("5S", 1);
+        CATEGORIES.put("6WS", 0);
+        CATEGORIES.put("3WN", 0);
+        CATEGORIES.put("1WN", 0);
+        CATEGORIES.put("Library", 2);
+        CATEGORIES.put("UH", 2);
+        CATEGORIES.put("CB", 0);
+        CATEGORIES.put("SU", 2);
+        CATEGORIES.put("Chaplaincy", 1);
+        CATEGORIES.put("Norwood House", 1);
+        CATEGORIES.put("WH", 1);
+        CATEGORIES.put("FH", 2);
+        CATEGORIES.put("3G", 4);
+        CATEGORIES.put("4W Cafe", 2);
+        CATEGORIES.put("Astro", 4);
+        CATEGORIES.put("Track", 3);
+        CATEGORIES.put("Volleyball", 3);
+        CATEGORIES.put("Bobsleigh Track", 3);
+        CATEGORIES.put("Clay", 3);
+        CATEGORIES.put("Eastwood Pitches", 4);
+        CATEGORIES.put("Estates", 1);
+        CATEGORIES.put("Hockey", 4);
+        CATEGORIES.put("Limekiln Pitches", 4);
+        CATEGORIES.put("Medical Centre", 1);
+        CATEGORIES.put("Tennis Courts", 3);
+        CATEGORIES.put("Rugby Pitch", 4);
+        CATEGORIES.put("Shooting Range", 3);
+        CATEGORIES.put("South Football Pitch", 4);
+        CATEGORIES.put("STV", 3);
+        CATEGORIES.put("St John's Pitches", 4);
+        CATEGORIES.put("The Edge", 2);
+        CATEGORIES.put("Lime Tree", 2);
 
         CAT_TO_COLOUR.put(0, R.color.vibrant_blue_light);
         CAT_TO_COLOUR.put(1, R.color.yellow);

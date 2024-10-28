@@ -7,20 +7,20 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.os.Bundle;
 import android.Manifest;
-import android.os.Looper;
 
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+/**
+ * Handles user location information and changes
+ */
 public class LocationService {
 
-    private Context context;
-    private LocationManager locationManager;
+    private final Context context;
+    private final LocationManager locationManager;
 
 
-    /*
+    /**
      * Constructs a LocationService with the given context.
      * @param context The context used to access system services.
      */
@@ -39,25 +39,18 @@ public class LocationService {
      * @return Transformed x and y coordinates
      */
     public static double[] transformCoordinates(double[] latAndLong){
-//        latAndLong[0] = latAndLong[0] - Constants.gpsOffset[0];
-//        latAndLong[1] = latAndLong[1] - Constants.gpsOffset[1];
-
-//        latAndLong[0] =  ((1000/360.0) * (180 + latAndLong[1]));
-//        latAndLong[1] =  ((1000/180.0) * (90 - latAndLong[0]));
-
         double[] inputPoint = {latAndLong[0], latAndLong[1], 1.0};
-        double[] homographicPoint = multiplyMatrices(Constants.gpsToCoordinateMatrix, inputPoint);
-
-
-        return homographicPoint;
+        return multiplyMatrices(Constants.gpsToCoordinateMatrix, inputPoint);
     }
 
+    /**
+     * Multiplies a 2D matrix by a 1D matrix (homography by a point)
+     * @param homography Homography (2D)
+     * @param point Point (1D)
+     * @return normalised (homography * point)
+     */
     public static double[] multiplyMatrices(double[][] homography, double[] point) {
         double[] result = new double[3];
-
-        double first = homography[0][0] * point[0];
-        double second = homography[0][1] * point[1];
-        double third = homography[0][2] * point[2];
 
         result[0] = homography[0][0] * point[0] + homography[0][1] * point[1] + homography[0][2] * point[2];
         result[1] = homography[1][0] * point[0] + homography[1][1] * point[1] + homography[1][2] * point[2];
@@ -71,11 +64,14 @@ public class LocationService {
         return result;
     }
 
+    /**
+     * Maps a Coordinate object to a 2D coordinate system
+     * @param coord Input coordinate (latitude and longitude)
+     * @return 2D coordinate (x and y)
+     */
     public static Coordinate transformCoords(Coordinate coord){
         coord.x =  ((1000/360.0) * (180 + coord.y));
         coord.y =  ((1000/180.0) * (90 - coord.x));
-
-        System.out.println(coord.x + "," +coord.y);
 
         return coord;
     }
@@ -98,7 +94,6 @@ public class LocationService {
 
     /**
      * Uses Fused Location client to get the current location of the device.
-     *
      * @return An array with the latitude at index 0, and longitude at index 1.
      */
     public double[] getLatAndLong() {
@@ -112,8 +107,4 @@ public class LocationService {
         }
         return latAndLong;
     }
-
-
-
-
 }

@@ -10,8 +10,6 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -21,7 +19,6 @@ import android.graphics.Color;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.ResourcesCompat;
 
 import com.cm20314.mapapp.R;
 import com.cm20314.mapapp.models.Building;
@@ -36,38 +33,30 @@ public class CanvasView extends View {
     public RouteResponseData routeData;
     private boolean displayRoute = false;
     private Coordinate location;
-    private Paint paint = new Paint(); // Paint object for coloring shapes
-    private float initX = 0f ;// See onTouchEvent
-    private float initY = 0f ;// See onTouchEvent
-
+    private final Paint paint = new Paint(); // Paint object for coloring shapes
+    private float initX = 0f;// See onTouchEvent
+    private float initY = 0f;// See onTouchEvent
     private float canvasX = 0f; // x-coord of canvas center
     private float canvasY = 0f; // y-coord of canvas center
-
     private boolean dragging = false; // May be unnecessary
     private boolean firstDraw = true;
-
     // Detector for scaling gestures (i.e. pinching or double tapping
-    private ScaleGestureDetector detector = new ScaleGestureDetector(getContext(), new ScaleListener());
+    private final ScaleGestureDetector detector = new ScaleGestureDetector(getContext(), new ScaleListener());
     private float scaleFactor = 2f; // Zoom level (initial value is 1x)
-
-    private float MIN_ZOOM = 1f;
-    private float MAX_ZOOM  = 10f;
-
     private double maxWidth = -1;
-
     private double maxHeight = -1;
-
-    private double PADDING = 200;
     private int fillColor;
     private boolean coloursEnabledPaths = false;
     private boolean coloursEnabledBuildings = false;
-
     private NodeArcDirection currentNodeArcDirection = null;
 
     public CanvasView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Handles repainting of canvas by initialising settings and then drawing
+     */
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
         super.onDraw(canvas);
@@ -80,9 +69,8 @@ public class CanvasView extends View {
             canvasY = 0;
             firstDraw = false;
         }
-        canvas.scale(scaleFactor, scaleFactor) ;// Scale the canvas according to scaleFactor
+        canvas.scale(scaleFactor, scaleFactor);// Scale the canvas according to scaleFactor
 
-        // Just draw a bunch of circles (this is for testing panning and zooming
         paint.setStyle(Paint.Style.FILL);
         paint.setColor(Color.parseColor("#000000"));
         canvas.translate(canvasX, canvasY);
@@ -90,6 +78,10 @@ public class CanvasView extends View {
         canvas.restore();
     }
 
+    /**
+     * Handles all touch events by taking the appropriate actions
+     * @param event The motion event.
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         float x = event.getX();
@@ -117,26 +109,13 @@ public class CanvasView extends View {
                     // Move the canvas dx units right and dy units down
                     // dx and dy are divided by scaleFactor so that panning speeds are consistent
                     //  with the zoom level
-                    canvasX += dx/scaleFactor;
-                    if (maxWidth !=-1){
-                        if(canvasX>0+PADDING){
-                      //      canvasX= (float) (0+PADDING);
-                        }
-                        else if(canvasX<-maxWidth+(getWidth()-PADDING)/scaleFactor){
-                        //   canvasX = (float) ((float)-maxWidth+(getWidth()-PADDING)/scaleFactor);
-
-                        }
-                    }
-
-                    canvasY += dy/scaleFactor;
-                    if (maxHeight !=-1){
-                        if(canvasY>0+PADDING){
-                            canvasY= (float) (0+PADDING);
-                        }
-                        else if(canvasY<-maxHeight+(getHeight()-PADDING)/scaleFactor){
-                            canvasY = (float) ((float)-maxHeight+(getHeight()-PADDING)/scaleFactor);
-
-
+                    canvasX += dx / scaleFactor;
+                    canvasY += dy / scaleFactor;
+                    if (maxHeight != -1) {
+                        if (canvasY > 0 + Constants.PADDING) {
+                            canvasY = 0 + Constants.PADDING;
+                        } else if (canvasY < -maxHeight + (getHeight() - Constants.PADDING) / scaleFactor) {
+                            canvasY = (float) -maxHeight + (getHeight() - Constants.PADDING) / scaleFactor;
                         }
                     }
 
@@ -146,22 +125,23 @@ public class CanvasView extends View {
                     initX = x;
                     initY = y;
                 }
-            break;
-        case ACTION_POINTER_UP:
+                break;
+            case ACTION_POINTER_UP:
                 // This sets initX and initY to the position of the pointer finger so that the
                 //  screen doesn't jump when it's lifted with the main finger still down
                 initX = x;
                 initY = y;
-            break;
+                break;
             case ACTION_UP:
                 dragging = false; // Again, may be unnecessary
         }
 
-        detector.onTouchEvent(event); // Listen for scale gestures (i.e. pinching or double tap+drag
-
-        return true;
+        return detector.onTouchEvent(event); // Listen for scale gestures (i.e. pinching or double tap+drag
     }
 
+    /**
+     * Listens for scale gestures and adjusts the scale factor
+     */
     private class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
         @Override
         public boolean onScale(@NonNull ScaleGestureDetector detector) {
@@ -169,7 +149,7 @@ public class CanvasView extends View {
             scaleFactor *= detector.getScaleFactor();
             // If scaleFactor is less than 0.5x, default to 0.5x as a minimum. Likewise, if
             //  scaleFactor is greater than 10x, default to 10x zoom as a maximum.
-            scaleFactor = Math.max(MIN_ZOOM, Math.min(scaleFactor, MAX_ZOOM));
+            scaleFactor = Math.max(Constants.MIN_ZOOM, Math.min(scaleFactor, Constants.MAX_ZOOM));
 
             invalidate(); // Re-draw the canvas
 
@@ -177,55 +157,89 @@ public class CanvasView extends View {
         }
     }
 
-    public void SetMapData(MapDataResponse data, Coordinate location, int fillColor){
+    /**
+     * Sets the map contents
+     * @param data Map data (buildings, rooms etc.)
+     * @param location Current location
+     * @param fillColor Fill colour
+     */
+    public void setMapData(MapDataResponse data, Coordinate location, int fillColor) {
         mapData = data;
         this.fillColor = fillColor;
         this.location = location;
-        maxWidth = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.x).max().orElse(0)).max().orElse(0);
-        maxHeight = mapData.buildings.stream().mapToDouble(b->b.polyline.coordinates.stream().mapToDouble(c->c.y).max().orElse(0)).max().orElse(0);
+        maxWidth = mapData.buildings.stream().mapToDouble(b -> b.polyline.coordinates.stream().mapToDouble(c -> c.x).max().orElse(0)).max().orElse(0);
+        maxHeight = mapData.buildings.stream().mapToDouble(b -> b.polyline.coordinates.stream().mapToDouble(c -> c.y).max().orElse(0)).max().orElse(0);
         invalidate();
     }
 
-    public void SetColoursEnabled(boolean enabledPaths, boolean enabledBuildings){
+    /**
+     * Sets the colour settings
+     * @param enabledPaths True if colours are enabled (paths), otherwise False
+     * @param enabledBuildings True if colours are enabled (buildings), otherwise False
+     */
+    public void setColoursEnabled(boolean enabledPaths, boolean enabledBuildings) {
         coloursEnabledPaths = enabledPaths;
         coloursEnabledBuildings = enabledBuildings;
     }
 
-    public void SetCurrentNodeArcDirection(NodeArcDirection direction){
+    /**
+     * Sets the current node arc direction (node arc and associated direction command)
+     * @param direction Current node arc direction
+     */
+    public void setCurrentNodeArcDirection(NodeArcDirection direction) {
         currentNodeArcDirection = direction;
     }
 
-    public void UpdateRoute(RouteResponseData data, boolean invalidateMap){
+    /**
+     * Update route data based on response from server
+     * @param data Route response data
+     * @param invalidateMap True if map should be invalidated, otherwise False
+     */
+    public void updateRoute(RouteResponseData data, boolean invalidateMap) {
         routeData = data;
-        if(invalidateMap) {
-            SetDisplayRoute(true);
+        if (invalidateMap) {
+            setDisplayRoute(true);
             invalidate();
         }
     }
 
-    public void UpdateRoute(RouteResponseData data){
-        UpdateRoute(data, true);
-    }
-
-    public void SetDisplayRoute(boolean display){
+    /**
+     * Displays or hides route
+     * @param display True if route should be displayed, otherwise False
+     */
+    public void setDisplayRoute(boolean display) {
         displayRoute = display;
     }
 
-    public void UpdateLocation(Coordinate location, boolean invalidateMap){
+    /**
+     * Update current location
+     * @param location Current location
+     * @param invalidateMap True if map should be invalidated, otherwise False
+     */
+    public void updateLocation(Coordinate location, boolean invalidateMap) {
         this.location = location;
-        if(invalidateMap) invalidate();
+        if (invalidateMap) invalidate();
     }
 
-    public void UpdateLocation(Coordinate location){
-        UpdateLocation(location, true);
+    /**
+     * Update current location
+     * @param location Current location
+     */
+    public void updateLocation(Coordinate location) {
+        updateLocation(location, true);
     }
 
-    private void drawBuildings(Canvas canvas){
+    /**
+     * Draws all the buildings on the canvas
+     * @param canvas Canvas to draw on
+     */
+    private void drawBuildings(Canvas canvas) {
         Paint paint = new Paint(); // Declare and initialize a Paint object
         paint.setStrokeWidth(4 / scaleFactor);
 
-        if( mapData == null) return;
+        if (mapData == null) return;
 
+        // Set brush
         Paint pathsPaint = new Paint();
         pathsPaint.setColor(Color.GRAY);
         pathsPaint.setStyle(Paint.Style.STROKE);
@@ -233,7 +247,8 @@ public class CanvasView extends View {
         pathsPaint.setAntiAlias(true);
         pathsPaint.setStrokeWidth(20 / scaleFactor);
 
-        for(int i = 0; i < mapData.paths.size(); i++){
+        // Loop through all available paths
+        for (int i = 0; i < mapData.paths.size(); i++) {
             Coordinate startCoordinate = mapData.paths.get(i).node1.coordinate;
             Coordinate endCoordinate = mapData.paths.get(i).node2.coordinate;
 
@@ -245,33 +260,34 @@ public class CanvasView extends View {
             canvas.drawLine(startX, startY, endX, endY, pathsPaint);
         }
 
-        for(Building building : mapData.buildings){
+        // Loop through all buildings
+        for (Building building : mapData.buildings) {
             paint.setColor(Color.GRAY); // Set the line color to black
             Path vectorPath = new Path();
-                for(int i = 0; i < building.polyline.coordinates.size(); i++){
-                    Coordinate startCoordinate = building.polyline.coordinates.get(i);
-                    int secondCoordIndex = i != building.polyline.coordinates.size() - 1 ? i + 1 : 0;
-                    Coordinate endCoordinate = building.polyline.coordinates.get(secondCoordIndex);
+            for (int i = 0; i < building.polyline.coordinates.size(); i++) {
+                Coordinate startCoordinate = building.polyline.coordinates.get(i);
+                int secondCoordIndex = i != building.polyline.coordinates.size() - 1 ? i + 1 : 0;
+                Coordinate endCoordinate = building.polyline.coordinates.get(secondCoordIndex);
 
-                    float startX = (float) (startCoordinate.x);
-                    float startY = (float) (startCoordinate.y);
-                    float endX = (float) (endCoordinate.x);
-                    float endY = (float) (endCoordinate.y);
+                float startX = (float) (startCoordinate.x);
+                float startY = (float) (startCoordinate.y);
+                float endX = (float) (endCoordinate.x);
+                float endY = (float) (endCoordinate.y);
 
-                    if(i == 0){
-                        vectorPath.moveTo(startX, startY);
-                    }
-                    vectorPath.lineTo(endX, endY);
-                    //canvas.drawLine(startX, startY, endX, endY, paint);
+                if (i == 0) {
+                    vectorPath.moveTo(startX, startY);
                 }
-                vectorPath.close();
+                vectorPath.lineTo(endX, endY);
+                //canvas.drawLine(startX, startY, endX, endY, paint);
+            }
+            vectorPath.close();
 
             Paint fillPaint = new Paint();
             fillPaint.setStyle(Paint.Style.FILL);
-            if(coloursEnabledBuildings){
-                fillPaint.setColor(getFillColor(Constants.COLOURS.getOrDefault(building.shortName, 0)));
-            }
-            else {
+            if (coloursEnabledBuildings) {
+                int fillColor = Constants.CATEGORIES.getOrDefault(building.shortName, 0);
+                fillPaint.setColor(getFillColor(fillColor));
+            } else {
                 fillPaint.setColor(fillColor);
             }
             fillPaint.setAntiAlias(true);
@@ -286,47 +302,48 @@ public class CanvasView extends View {
 
             // First draw the fill path.
             canvas.drawPath(vectorPath, fillPaint);
-// Then overlap this with the border path.
+            // Then overlap this with the border path.
             canvas.drawPath(vectorPath, borderPaint);
 
-            Coordinate offset = Constants.TEXT_OFFSETS.getOrDefault(building.shortName, new Coordinate(0,0));
+            Coordinate offset = Constants.TEXT_OFFSETS.getOrDefault(building.shortName, new Coordinate(0, 0));
 
             paint.setTextSize(7);
-                paint.setColor(getColor(androidx.appcompat.R.attr.colorAccent));
-                paint.setTextAlign(Paint.Align.CENTER);
+            paint.setColor(getColor(androidx.appcompat.R.attr.colorAccent));
+            paint.setTextAlign(Paint.Align.CENTER);
 
-                float midX = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble() + offset.x);
-                float midY = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble() + offset.y);
-                canvas.drawText(building.shortName, midX, midY, paint);
-            }
+            float midX = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.x).average().getAsDouble() + offset.x);
+            float midY = (float) (building.polyline.coordinates.stream().mapToDouble(c -> c.y).average().getAsDouble() + offset.y);
+            canvas.drawText(building.shortName, midX, midY, paint);
+        }
 
-        if(displayRoute){
+        // Display calculated route
+        if (displayRoute) {
             // Display the route
             Paint pathPaint = new Paint();
-            if(!coloursEnabledPaths){
+            if (!coloursEnabledPaths) {
                 pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
-            }
-            else{
+            } else {
                 pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimary));
             }
             pathPaint.setStyle(Paint.Style.STROKE);
             pathPaint.setStrokeWidth(8 / scaleFactor);
 
-            for(int i = 0; i < routeData.nodeArcDirections.size(); i++){
-                    NodeArcDirection nodeArcDirection = routeData.nodeArcDirections.get(i);
-                    Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
-                    Coordinate endCoordinate = nodeArcDirection.nodeArc.node2.coordinate;
+            // Loop through node arcs
+            for (int i = 0; i < routeData.nodeArcDirections.size(); i++) {
+                NodeArcDirection nodeArcDirection = routeData.nodeArcDirections.get(i);
+                Coordinate startCoordinate = nodeArcDirection.nodeArc.node1.coordinate;
+                Coordinate endCoordinate = nodeArcDirection.nodeArc.node2.coordinate;
 
-                    if(coloursEnabledPaths && nodeArcDirection.equals(currentNodeArcDirection)){
-                        pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
-                    }
+                if (coloursEnabledPaths && nodeArcDirection.equals(currentNodeArcDirection)) {
+                    pathPaint.setColor(getColor(androidx.appcompat.R.attr.colorPrimaryDark));
+                }
 
-                    float startX = (float) (startCoordinate.x);
-                    float startY = (float) (startCoordinate.y);
-                    float endX = (float) (endCoordinate.x);
-                    float endY = (float) (endCoordinate.y);
+                float startX = (float) (startCoordinate.x);
+                float startY = (float) (startCoordinate.y);
+                float endX = (float) (endCoordinate.x);
+                float endY = (float) (endCoordinate.y);
 
-                    canvas.drawLine(startX, startY, endX, endY, pathPaint);
+                canvas.drawLine(startX, startY, endX, endY, pathPaint);
             }
 
             pathPaint.setStyle(Paint.Style.FILL);
@@ -351,12 +368,24 @@ public class CanvasView extends View {
         canvas.drawCircle((float) location.x, (float) location.y, 9 / scaleFactor, paint);
 
     }
-    private int getColor(int attrId){
+
+    /**
+     * Helper method to get colour from attribute ID
+     * @param attrId Attribute ID
+     * @return Colour
+     */
+    private int getColor(int attrId) {
         TypedValue typedValue = new TypedValue();
         getContext().getTheme().resolveAttribute(attrId, typedValue, true);
-        return  typedValue.data;
+        return typedValue.data;
     }
+
+    /**
+     * Gets fill colour for given category
+     * @param catId Category ID
+     * @return Colour
+     */
     private int getFillColor(int catId) {
-       return getResources().getColor(Constants.CAT_TO_COLOUR.getOrDefault(catId, R.color.vibrant_blue_light), getContext().getTheme());
+        return getResources().getColor(Constants.CAT_TO_COLOUR.getOrDefault(catId, R.color.vibrant_blue_light), getContext().getTheme());
     }
 }

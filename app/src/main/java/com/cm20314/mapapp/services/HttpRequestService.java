@@ -9,7 +9,6 @@ import com.cm20314.mapapp.BuildConfig;
 import com.cm20314.mapapp.interfaces.IHttpRequestCallback;
 import com.google.android.material.progressindicator.CircularProgressIndicator;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -18,15 +17,23 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * A generic class for HTTP requests, with built in progress indicator functionality
+ * @param <TIn> The type of the request body
+ * @param <TOut> The type of the response body
+ */
 public class HttpRequestService<TIn, TOut> {
 
     public static CircularProgressIndicator progressIndicator;
 
+    /**
+     * A generic class for the HTTP response
+     * @param <T> The type of the response body
+     */
     public static class HttpRequestResponse<T> {
         public T Content;
         public String ResponseBody;
@@ -34,6 +41,11 @@ public class HttpRequestService<TIn, TOut> {
         public boolean ConnectionSucceeded;
     }
 
+    /**
+     * A generic class to send requests (to run as a thread)
+     * @param <TIn> The type of the request body
+     * @param <TOut> The type of the response body
+     */
     public static class SendRequestTask<TIn, TOut> implements Runnable {
         private final String method;
         private final String uri;
@@ -43,6 +55,16 @@ public class HttpRequestService<TIn, TOut> {
         private final IHttpRequestCallback<TOut> callback;
         private final Class<TOut> outClass;
 
+        /**
+         * Constructor
+         * @param method HTTP method (e.g. "POST")
+         * @param uri Request URI
+         * @param obj Request body object
+         * @param hasContent True if request has body, otherwise False
+         * @param uiHandler Looper attached to the main thread of the source activity
+         * @param callback Callback method to return response
+         * @param outClass Response type
+         */
         public SendRequestTask(String method, String uri, TIn obj, boolean hasContent,
                                Handler uiHandler, IHttpRequestCallback<TOut> callback, Class<TOut> outClass) {
             this.method = method;
@@ -58,12 +80,7 @@ public class HttpRequestService<TIn, TOut> {
         public void run() {
             HttpRequestResponse<TOut> httpResponse = new HttpRequestResponse<>();
             if (progressIndicator != null) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        progressIndicator.show();
-                    }
-                });
+                runOnUiThread(() -> progressIndicator.show());
             }
 
             try {
@@ -84,9 +101,6 @@ public class HttpRequestService<TIn, TOut> {
 
                 int responseCode = connection.getResponseCode();
                 String responseBody = readResponse(connection);
-                if(hasContent){
-                    //responseBody = Constants.defResponse;
-                }
 
                 httpResponse.ResponseStatusCode = responseCode;
                 httpResponse.ResponseBody = responseBody;
@@ -104,39 +118,42 @@ public class HttpRequestService<TIn, TOut> {
             }
 
                 if (progressIndicator != null) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            progressIndicator.hide();
-                        }
-                    });
+                    runOnUiThread(() -> progressIndicator.hide());
                 }
 
             handleResponse(httpResponse);
         }
 
+        /**
+         * Uses the UI Handler and callback to return the response
+         * @param httpResponse Response object
+         */
         private void handleResponse(final HttpRequestResponse<TOut> httpResponse) {
-            uiHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onCompleted(httpResponse);
-                }
-            });
+            uiHandler.post(() -> callback.onCompleted(httpResponse));
         }
 
+        /**
+         * Deserialises the JSON response body
+         * @param responseBody JSON response body
+         * @return Response body object
+         */
         private TOut parseResponse(String responseBody) {
             return new Gson().fromJson(responseBody, outClass);
         }
 
+        /**
+         * Uses the UI Handler and callback to notify of exception
+         */
         private void handleException() {
-            uiHandler.post(new Runnable() {
-                @Override
-                public void run() {
-                    callback.onException();
-                }
-            });
+            uiHandler.post(callback::onException);
         }
 
+        /**
+         * Reads and returns the full response from the HTTP connection as a string
+         * @param connection HttpURLConnection to read the response from
+         * @return String response
+         * @throws IOException If an I/O error occurs while reading the response
+         */
         private String readResponse(HttpURLConnection connection) throws IOException {
             BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
             StringBuilder response = new StringBuilder();
@@ -149,6 +166,15 @@ public class HttpRequestService<TIn, TOut> {
         }
     }
 
+    /**
+     * Sends a HTTP request by starting the SendRequestTask thread
+     * @param method HTTP method (e.g. "POST")
+     * @param uri Request URI
+     * @param obj Request body object
+     * @param hasContent True if request has body, otherwise False
+     * @param callback Callback method to return response
+     * @param outClass Response type
+     */
     public void sendHttpRequest(String method, String uri, TIn obj, boolean hasContent,
                                 IHttpRequestCallback<TOut> callback, Class<TOut> outClass) {
         ExecutorService executor = Executors.newSingleThreadExecutor();

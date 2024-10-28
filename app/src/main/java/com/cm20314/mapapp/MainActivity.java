@@ -1,30 +1,18 @@
 package com.cm20314.mapapp;
 
-import android.app.AlertDialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.SharedPreferences;
 
 import android.content.pm.PackageManager;
 
 import android.os.Bundle;
 
-import com.cm20314.mapapp.models.Coordinate;
 import com.cm20314.mapapp.services.Constants;
 import com.cm20314.mapapp.services.ElevationService;
 import com.cm20314.mapapp.services.HttpRequestService;
-import com.cm20314.mapapp.services.LocationService;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-import androidx.preference.PreferenceManager;
 
 import com.cm20314.mapapp.databinding.ActivityMainBinding;
 import com.microsoft.appcenter.AppCenter;
@@ -32,15 +20,9 @@ import com.microsoft.appcenter.analytics.Analytics;
 import com.microsoft.appcenter.crashes.Crashes;
 import android.Manifest;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.Toast;
 
-import java.io.StringWriter;
-
-
 public class MainActivity extends AppCompatActivity{
-
-    private ActivityMainBinding binding;
 
     public static ElevationService elevationService = new ElevationService();
     private SharedPreferences preferences;
@@ -54,29 +36,16 @@ public class MainActivity extends AppCompatActivity{
 
         Constants.Initialise();
 
-        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        com.cm20314.mapapp.databinding.ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Passing each menu ID as a set of Ids because each
-        // menu should be considered as top level destinations.
-//        AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-//                R.id.navigation_map, R.id.navigation_settings)
-//                .build();
-//        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
-//        //NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-//        NavigationUI.setupWithNavController(binding.navView, navController);
-
-        //getting location permissions
         if (!permissionsGranted()){
             getLocationPermissions();
         }
 
         HttpRequestService.progressIndicator = findViewById(R.id.progress_indicator);
-        preferences = getApplicationContext().getSharedPreferences(getDefaultSharedPreferencesName(), MODE_PRIVATE);
-    }
-
-    private String getDefaultSharedPreferencesName() {
-        return getApplicationContext().getPackageName() + "_preferences";
+        String defaultSharedPreferencesName = getApplicationContext().getPackageName() + "_preferences";
+        preferences = getApplicationContext().getSharedPreferences(defaultSharedPreferencesName, MODE_PRIVATE);
     }
 
     /**
@@ -100,7 +69,12 @@ public class MainActivity extends AppCompatActivity{
                 80085);
     }
 
-
+    /**
+     * Handles key events to simulate elevation tracking
+     * @param event The key event.
+     *
+     * @return True
+     */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int action = event.getAction();

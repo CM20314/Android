@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import android.content.Context;
 
 import com.cm20314.mapapp.models.Coordinate;
+import com.cm20314.mapapp.models.NodeArcDirection;
 import com.cm20314.mapapp.models.RouteResponseData;
 import com.google.gson.Gson;
 
@@ -38,16 +39,15 @@ public class RoutingServiceTests {
 
     @Test
     public void DirectionTextTest2(){
-        String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(183, 460)).direction;
-        String expectedOutput = "false";
+        NodeArcDirection directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(183, 460));
 
-        assertEquals(expectedOutput, directionCommand);
+        assertNull(directionCommand);
     }
 
     @Test
     public void DirectionTextTest3(){
         String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 460)).direction;
-        String expectedOutput = "Walk";
+        String expectedOutput = "Turn Right";
 
         assertEquals(expectedOutput, directionCommand);
     }
@@ -55,7 +55,7 @@ public class RoutingServiceTests {
     @Test
     public void DirectionTextTest4(){
         String directionCommand = routingService.getDirectionCommand(testRouteData.nodeArcDirections, new Coordinate(285, 463)).direction;
-        String expectedOutput = "Turn Right";
+        String expectedOutput = "Arrive";
 
         assertEquals(expectedOutput, directionCommand);
     }
